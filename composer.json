@@ -1,0 +1,38 @@
+{
+  "name": "wdmg/yii2-pages",
+  "description": "Manage static application pages",
+  "keywords": ["yii2", "yii2-pages", "static", "pages", "wdmg"],
+  "type": "yii2-extension",
+  "license": "MIT",
+  "version": "0.0.1",
+  "homepage": "https://github.com/wdmg/yii2-pages",
+  "support": {
+    "source": "https://github.com/wdmg/yii2-pages",
+    "issues": "https://github.com/wdmg/yii2-pages/issues"
+  },
+  "authors": [
+    {
+      "name": "Alexsander Vyshnyvetskyy",
+      "email": "alex.vyshnyvetskyy@gmail.com"
+    },
+    {
+      "name": "W.D.M.Group, Ukraine",
+      "email": "wdmg.com.ua@gmail.com"
+    }
+  ],
+  "require": {
+    "yiisoft/yii2": "^2.0.20",
+    "wdmg/yii2-base": "^1.0.1"
+  },
+  "minimum-stability": "dev",
+  "autoload": {
+    "psr-4": {
+      "wdmg\\pages\\": ""
+    }
+  },
+  "extra": {
+    "options": {
+      "routePrefix": "admin"
+    }
+  }
+}
