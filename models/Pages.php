@@ -111,7 +111,7 @@ class Pages extends ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getStatusModes($allStatuses = false)
+    public function getStatusesList($allStatuses = false)
     {
         if($allStatuses)
             return [

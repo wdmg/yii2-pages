@@ -18,7 +18,7 @@ class PagesSearch extends Pages
     {
         return [
             [['id'], 'integer'],
-            [['section', 'param', 'value', 'default', 'label', 'type', 'autoload', 'protected', 'created_at', 'updated_at'], 'safe'],
+            [['name', 'alias', 'title', 'description', 'keywords', 'status'], 'safe'],
         ];
     }
 

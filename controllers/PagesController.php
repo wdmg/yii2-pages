@@ -109,4 +109,121 @@ class PagesController extends Controller
         ]);
 
     }
+
+
+
+    /**
+     * Updates an existing Page model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionUpdate($id)
+    {
+        $model = $this->findModel($id);
+        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
+
+        if ($model->load(Yii::$app->request->post())) {
+            if($model->save()) {
+                Yii::$app->getSession()->setFlash(
+                    'success',
+                    Yii::t(
+                        'app/modules/pages',
+                        'OK! Page `{name}` successfully updated.',
+                        [
+                            'name' => $model->name
+                        ]
+                    )
+                );
+            } else {
+                Yii::$app->getSession()->setFlash(
+                    'danger',
+                    Yii::t(
+                        'app/modules/pages',
+                        'An error occurred while update a page `{name}`.',
+                        [
+                            'name' => $model->name
+                        ]
+                    )
+                );
+            }
+            return $this->redirect(['index']);
+        }
+
+        return $this->render('update', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * Displays a single Page model.
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionView($id)
+    {
+        $model = $this->findModel($id);
+        return $this->render('view', [
+            'model' => $model
+        ]);
+    }
+
+    /**
+     * Deletes an existing Pages model.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionDelete($id)
+    {
+
+        $model = $this->findModel($id);
+        if($model->delete()) {
+            Yii::$app->getSession()->setFlash(
+                'success',
+                Yii::t(
+                    'app/modules/pages',
+                    'OK! Page `{name}` successfully deleted.',
+                    [
+                        'name' => $model->name
+                    ]
+                )
+            );
+        } else {
+            Yii::$app->getSession()->setFlash(
+                'danger',
+                Yii::t(
+                    'app/modules/pages',
+                    'An error occurred while deleting a page `{name}`.',
+                    [
+                        'name' => $model->name
+                    ]
+                )
+            );
+        }
+
+        return $this->redirect(['index']);
+    }
+
+    /**
+     * Finds the Pages model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return Settings the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        if (($model = Pages::findOne($id)) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException(Yii::t('app/modules/pages', 'The requested page does not exist.'));
+    }
 }
