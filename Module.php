@@ -6,7 +6,7 @@ namespace wdmg\pages;
  * Yii2 Pages
  *
  * @category        Module
- * @version         0.0.1
+ * @version         1.0.0
  * @author          Alexsander Vyshnyvetskyy <alex.vyshnyvetskyy@gmail.com>
  * @link            https://github.com/wdmg/yii2-pages
  * @copyright       Copyright (c) 2019 W.D.M.Group, Ukraine
@@ -45,7 +45,7 @@ class Module extends BaseModule
     /**
      * @var string the module version
      */
-    private $version = "0.0.1";
+    private $version = "1.0.0";
 
     /**
      * @var integer, priority of initialization
@@ -87,5 +87,15 @@ class Module extends BaseModule
     public function bootstrap($app)
     {
         parent::bootstrap($app);
+
+        // Add module URL rules
+        $app->getUrlManager()->addRules([
+            [
+                'pattern' => 'pages/<page:[\w-]+>',
+                'route' => 'admin/pages/default/index',
+                'suffix' => ''
+            ],
+            'pages/<page:[\w-]+>' => 'admin/pages/default/index',
+        ], true);
     }
 }

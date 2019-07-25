@@ -2,27 +2,13 @@
 
 use yii\helpers\Html;
 use yii\helpers\Url;
-use yii\bootstrap\Modal;
+use yii\grid\GridView;
+use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
 
 $this->title = $this->context->module->name;
 $this->params['breadcrumbs'][] = $this->title;
-
-$this->registerJs(<<< JS
-
-    /* To initialize BS3 tooltips set this below */
-    $(function () {
-        $("[data-toggle='tooltip']").tooltip(); 
-    });
-    
-    /* To initialize BS3 popovers set this below */
-    $(function () {
-        $("[data-toggle='popover']").popover(); 
-    });
-
-JS
-);
 
 ?>
 <div class="page-header">
@@ -32,6 +18,28 @@ JS
 </div>
 <div class="pages-index">
 
+    <?php Pjax::begin(); ?>
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
+        'layout' => '{summary}<br\/>{items}<br\/>{summary}<br\/><div class="text-center">{pager}</div>',
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+            'name',
+            'alias',
+            'content',
+            'title',
+            'description',
+            'keywords',
+            'status',
+            ['class' => 'yii\grid\ActionColumn']
+        ]
+    ]); ?>
+    <hr/>
+    <div>
+        <?= Html::a(Yii::t('app/modules/pages', 'Add new page'), ['pages/create'], ['class' => 'btn btn-success pull-right']) ?>
+    </div>
+    <?php Pjax::end(); ?>
 </div>
 
 <?php echo $this->render('../_debug'); ?>
