@@ -17,7 +17,13 @@ if (!empty($model->description))
 if (!empty($model->keywords))
     $this->registerMetaTag(['content' => Html::encode($model->keywords), 'name' => 'keywords']);
 
-$this->registerLinkTag(['rel' => 'canonical', 'href' => Url::to('pages/'.$model->alias, true)]);
+
+if (isset($model->route))
+    $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::to($model->route.'/'.$model->alias, true)]);
+elseif (isset($route))
+    $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::to($route.'/'.$model->alias, true)]);
+else
+    $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 
 ?>
 

@@ -6,7 +6,7 @@ namespace wdmg\pages;
  * Yii2 Pages
  *
  * @category        Module
- * @version         1.0.1
+ * @version         1.1.0
  * @author          Alexsander Vyshnyvetskyy <alex.vyshnyvetskyy@gmail.com>
  * @link            https://github.com/wdmg/yii2-pages
  * @copyright       Copyright (c) 2019 W.D.M.Group, Ukraine
@@ -16,6 +16,7 @@ namespace wdmg\pages;
 
 use Yii;
 use wdmg\base\BaseModule;
+use yii\helpers\ArrayHelper;
 
 /**
  * Pages module definition class
@@ -45,7 +46,7 @@ class Module extends BaseModule
     /**
      * @var string the module version
      */
-    private $version = "1.0.1";
+    private $version = "1.1.0";
 
     /**
      * @var integer, priority of initialization
@@ -75,11 +76,22 @@ class Module extends BaseModule
         // Set priority of current module
         $this->setPriority($this->priority);
 
-        // Process to normalize route for pages in frontend
+        // Process and normalize route for pages in frontend
+        $model = new \wdmg\pages\models\Pages();
+        $pages = $model->getRoutes(true);
+        $this->pagesRoute = ArrayHelper::merge(
+            is_array($this->pagesRoute) ? $this->pagesRoute : [$this->pagesRoute],
+            array_unique(ArrayHelper::getColumn($pages, 'route'))
+        );
         $this->pagesRoute = self::normalizePagesRoute($this->pagesRoute);
-
     }
 
+    /**
+     * Normalization to normal path/route
+     *
+     * @param string or array $routes
+     * @return string or array of normalized route`s
+     */
     public function normalizePagesRoute($routes)
     {
         if (is_array($routes)) {
@@ -125,7 +137,7 @@ class Module extends BaseModule
                             'route' => 'admin/pages/default/index',
                             'suffix' => ''
                         ],
-                        '/<page:[\w-]+>' => 'admin/pages/default/index',
+                        '/<page:[\w-]+>/<route:[\w-]+>' => 'admin/pages/default/index',
                     ], true);
                 } else {
                     $app->getUrlManager()->addRules([
@@ -134,7 +146,7 @@ class Module extends BaseModule
                             'route' => 'admin/pages/default/index',
                             'suffix' => ''
                         ],
-                        $route . '/<page:[\w-]+>' => 'admin/pages/default/index',
+                        $route . '/<page:[\w-]+>/<route:[\w-]+>' => 'admin/pages/default/index',
                     ], true);
                 }
             }
@@ -146,7 +158,7 @@ class Module extends BaseModule
                         'route' => 'admin/pages/default/index',
                         'suffix' => ''
                     ],
-                    '/<page:[\w-]+>' => 'admin/pages/default/index',
+                    '/<page:[\w-]+>/<route:[\w-]+>' => 'admin/pages/default/index',
                 ], true);
             } else {
                 $app->getUrlManager()->addRules([
@@ -155,7 +167,7 @@ class Module extends BaseModule
                         'route' => 'admin/pages/default/index',
                         'suffix' => ''
                     ],
-                    $pagesRoute . '/<page:[\w-]+>' => 'admin/pages/default/index',
+                    $pagesRoute . '/<page:[\w-]+>/<route:[\w-]+>' => 'admin/pages/default/index',
                 ], true);
             }
         }

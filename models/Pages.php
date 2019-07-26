@@ -71,7 +71,6 @@ class Pages extends ActiveRecord
     public function rules()
     {
         $rules = [
-
             [['name', 'alias', 'content'], 'required'],
             [['name', 'alias'], 'string', 'min' => 3, 'max' => 128],
             [['name', 'alias'], 'string', 'min' => 3, 'max' => 128],
@@ -113,6 +112,24 @@ class Pages extends ActiveRecord
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function beforeSave($insert)
+    {
+        if(empty(trim($this->route)))
+            $this->route = null;
+        else
+            $this->route = trim($this->route);
+
+        if(empty(trim($this->layout)))
+            $this->layout = null;
+        else
+            $this->layout = trim($this->layout);
+
+        return parent::beforeSave($insert);
+    }
+
 
     /**
      * @return \yii\db\ActiveQuery
@@ -130,6 +147,17 @@ class Pages extends ActiveRecord
                 self::PAGE_STATUS_DRAFT => Yii::t('app/modules/pages', 'Draft'),
                 self::PAGE_STATUS_PUBLISHED => Yii::t('app/modules/pages', 'Published'),
             ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRoutes($asArray = false)
+    {
+        if ($asArray)
+            return self::find()->select(['route'])->distinct()->asArray()->all();
+        else
+            return self::find()->select(['route'])->distinct()->all();
     }
 
     /**

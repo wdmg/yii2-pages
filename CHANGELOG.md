@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## 1.1.0 (2019-07-27)
+ * Added routing functionality
+
 ## 1.0.1 (2019-07-26)
  * Added default route and layout for rendered page
 

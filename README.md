@@ -62,6 +62,6 @@ Use the `Module::dashboardNavItems()` method of the module to generate a navigat
     ?>
 
 # Status and version [in progress development]
+* v.1.1.0 - Added routing functionality
 * v.1.0.1 - Added default route and layout for rendered page
 * v.1.0.0 - Added migrations, models, CRUD, views and translations
-* v.0.0.1 - Added base module, controller and translations

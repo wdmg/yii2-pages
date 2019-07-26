@@ -27,21 +27,42 @@ class DefaultController extends Controller
 
     /**
      * View of page.
+     * If the page was found and it has a route setup that does not match the current route
+     * of the request, an NotFoundHttpException will be thrown.
+     * If the page does not have a route, such a check is not performed and the page can be
+     * displayed if such a route is allowed as the default setting in the module.
      *
      * @param string $page aliases of searching page.
      * @return mixed
      * @see Pages::$alias
      */
-    public function actionIndex($page)
+    public function actionIndex($page, $route = null)
     {
+
+        if (is_null($route))
+            $route = str_replace('/'.$page, '', Yii::$app->request->url);
+
+        // If route is root
+        if (empty($route))
+            $route = '/';
+
+        // Search page model with alias
         $model = $this->findModel($page);
 
+        // Checking requested route with page route if set
+        if (isset($model->route)) {
+            if ($model->route !== $route) {
+                throw new NotFoundHttpException();
+            }
+        }
+
         // Set a custom layout to render page
-        if(isset($model->layout))
+        if (isset($model->layout))
             $this->layout = $model->layout;
 
         return $this->render('index', [
             'model' => $model,
+            'route' => $route
         ]);
     }
 
