@@ -24,10 +24,21 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'name',
                 'format' => 'raw',
                 'value' => function($model) {
+
                     $output = Html::tag('strong', $model->name);
 
+                    if (isset($model->route)) {
+                        $route = $model->route;
+                    } else {
+                        if (is_array($this->context->module->pagesRoute)) {
+                            $route = array_shift($this->context->module->pagesRoute);
+                        } else {
+                            $route = $this->context->module->pagesRoute;
+                        }
+                    }
+
                     if($model->alias)
-                        $output .= '<br/>' . Html::a(Url::to('pages/'.$model->alias, true), Url::to('pages/'.$model->alias, true), [
+                        $output .= '<br/>' . Html::a(Url::to($route."/".$model->alias, true), Url::to($route."/".$model->alias, true), [
                                 'target' => '_blank',
                                 'data-pjax' => 0
                             ]);
@@ -52,6 +63,31 @@ $this->params['breadcrumbs'][] = $this->title;
                         return '<span class="label label-default">'.Yii::t('app/modules/pages','Draft').'</span>';
                     else
                         return $data->status;
+                }
+            ],
+            [
+                'attribute' => 'route',
+                'format' => 'html',
+                'value' => function($data) {
+
+                    if (isset($data->route))
+                        return Html::tag('strong', $data->route);
+                    elseif (isset($this->context->module->pagesRoute))
+                        return ((is_array($this->context->module->pagesRoute)) ? array_shift($this->context->module->pagesRoute) : $this->context->module->pagesRoute) .'&nbsp;'. Html::tag('span', Yii::t('app/modules/pages','by default'), ['class' => 'label label-default']);
+                    else
+                        return null;
+                }
+            ],
+            [
+                'attribute' => 'layout',
+                'format' => 'html',
+                'value' => function($data) {
+                    if (isset($data->layout))
+                        return Html::tag('strong', $data->layout);
+                    elseif (isset($this->context->module->pagesLayout))
+                        return $this->context->module->pagesLayout .'&nbsp;'. Html::tag('span', Yii::t('app/modules/pages','by default'), ['class' => 'label label-default']);
+                    else
+                        return null;
                 }
             ],
             'created_at:datetime',

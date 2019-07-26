@@ -27,6 +27,8 @@ use wdmg\widgets\SelectInput;
             'class' => 'form-control'
         ]
     ]); ?>
+    <?= $form->field($model, 'route')->textInput() ?>
+    <?= $form->field($model, 'layout')->textInput() ?>
     <hr/>
     <div class="form-group">
         <?= Html::a(Yii::t('app/modules/pages', '&larr; Back to list'), ['pages/index'], ['class' => 'btn btn-default pull-left']) ?>&nbsp;

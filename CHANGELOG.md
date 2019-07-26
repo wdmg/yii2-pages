@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## 1.0.1 (2019-07-26)
+ * Added default route and layout for rendered page
+
 ## 1.0.0 (2019-07-25)
  * Added CRUD, fix translations
  * Added migrations, models, views and translations

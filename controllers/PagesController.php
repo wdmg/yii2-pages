@@ -87,6 +87,8 @@ class PagesController extends Controller
     {
         $model = new Pages();
         $model->status = $model::PAGE_STATUS_DRAFT;
+        $model->route = null;
+        $model->layout = null;
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -105,6 +107,7 @@ class PagesController extends Controller
         }
 
         return $this->render('create', [
+            'module' => $this->module,
             'model' => $model
         ]);
 
@@ -155,7 +158,8 @@ class PagesController extends Controller
         }
 
         return $this->render('update', [
-            'model' => $model,
+            'module' => $this->module,
+            'model' => $model
         ]);
     }
 
@@ -169,6 +173,7 @@ class PagesController extends Controller
     {
         $model = $this->findModel($id);
         return $this->render('view', [
+            'module' => $this->module,
             'model' => $model
         ]);
     }

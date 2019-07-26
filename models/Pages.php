@@ -22,6 +22,8 @@ use yii\behaviors\BlameableBehavior;
  * @property string $description
  * @property string $keywords
  * @property integer $status
+ * @property string $route
+ * @property string $layout
  * @property string $created_at
  * @property integer $created_by
  * @property string $updated_at
@@ -75,6 +77,8 @@ class Pages extends ActiveRecord
             [['name', 'alias'], 'string', 'min' => 3, 'max' => 128],
             [['title', 'description', 'keywords'], 'string', 'max' => 255],
             [['status'], 'boolean'],
+            ['route', 'string', 'max' => 32],
+            ['layout', 'string', 'max' => 64],
             ['alias', 'unique', 'message' => Yii::t('app/modules/pages', 'Param attribute must be unique.')],
             ['alias', 'match', 'pattern' => '/^[A-Za-z0-9\-]+$/', 'message' => Yii::t('app/modules/pages','It allowed only Latin alphabet, numbers and the «-» character')],
             [['created_at', 'updated_at'], 'safe'],
@@ -100,6 +104,8 @@ class Pages extends ActiveRecord
             'description' => Yii::t('app/modules/pages', 'Description'),
             'keywords' => Yii::t('app/modules/pages', 'Keywords'),
             'status' => Yii::t('app/modules/pages', 'Status'),
+            'route' => Yii::t('app/modules/pages', 'Route'),
+            'layout' => Yii::t('app/modules/pages', 'Layout'),
             'created_at' => Yii::t('app/modules/pages', 'Created at'),
             'created_by' => Yii::t('app/modules/pages', 'Created by'),
             'updated_at' => Yii::t('app/modules/pages', 'Updated at'),

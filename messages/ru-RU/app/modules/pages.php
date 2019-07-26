@@ -12,11 +12,14 @@ return [
     'Description' => "Описание",
     'Keywords' => "Ключевые слова",
     'Status' => "Статус",
+    'Route' => "Роутинг",
+    'Layout' => "Лейаут",
     'Created at' => "Создано",
     'Updated at' => "Обновлено",
     'Created by' => "Автор создания",
     'Updated by' => "Автор изменений",
 
+    'View page' => "Просмотр страницы",
     'All pages' => "Все страницы",
     'Updating page: {name}' => "Редактирование страницы: {name}",
     'Edit' => "Редактирование",
@@ -29,6 +32,8 @@ return [
     'All statuses' => "Все статусы",
     'Draft' => "Черновик",
     'Published' => "Опубликовано",
+
+    'by default' => "по-умолчанию",
 
     'Create page' => "Создание страницы",
     'Add new page' => "Добавить страницу",

@@ -31,10 +31,21 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'name',
                 'format' => 'raw',
                 'value' => function($model) {
+
                     $output = Html::tag('strong', $model->name);
 
+                    if (isset($model->route)) {
+                        $route = $model->route;
+                    } else {
+                        if (is_array($this->context->module->pagesRoute)) {
+                            $route = array_shift($this->context->module->pagesRoute);
+                        } else {
+                            $route = $this->context->module->pagesRoute;
+                        }
+                    }
+
                     if($model->alias)
-                        $output .= '<br/>' . Html::a(Url::to('pages/'.$model->alias, true), Url::to('pages/'.$model->alias, true), [
+                        $output .= '<br/>' . Html::a(Url::to($route."/".$model->alias, true), Url::to($route."/".$model->alias, true), [
                             'target' => '_blank',
                             'data-pjax' => 0
                         ]);
