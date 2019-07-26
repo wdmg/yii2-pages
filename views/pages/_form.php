@@ -27,8 +27,8 @@ use wdmg\widgets\SelectInput;
             'class' => 'form-control'
         ]
     ]); ?>
-    <?= $form->field($model, 'route')->textInput() ?>
-    <?= $form->field($model, 'layout')->textInput() ?>
+    <?= $form->field($model, 'route')->textInput(['placeholder' => (is_null($model->route)) ? ((is_array($this->context->module->pagesRoute)) ? array_shift($this->context->module->pagesRoute) : $this->context->module->pagesRoute) : false]) ?>
+    <?= $form->field($model, 'layout')->textInput(['placeholder' => (is_null($model->layout)) ? ((isset($this->context->module->pagesLayout)) ? $this->context->module->pagesLayout : '') : false]) ?>
     <hr/>
     <div class="form-group">
         <?= Html::a(Yii::t('app/modules/pages', '&larr; Back to list'), ['pages/index'], ['class' => 'btn btn-default pull-left']) ?>&nbsp;
