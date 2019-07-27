@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use wdmg\widgets\Editor;
 use wdmg\widgets\SelectInput;
@@ -10,9 +11,19 @@ use wdmg\widgets\SelectInput;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="tasks-form">
-    <?php $form = ActiveForm::begin(); ?>
+<div class="pages-form">
+    <?php $form = ActiveForm::begin([
+        'id' => "addPageForm",
+        'enableAjaxValidation' => true
+    ]); ?>
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+    <?php
+        if (($pageURL = $model->getPageUrl()) && $model->id)
+            echo  Html::tag('label', Yii::t('app/modules/pages', 'Page URL')) . Html::tag('fieldset', Html::a($pageURL, $pageURL, [
+                'target' => '_blank',
+                'data-pjax' => 0
+            ])) . '<br/>';
+    ?>
     <?= $form->field($model, 'alias')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'content')->widget(Editor::className(), [
         'options' => [],
@@ -36,3 +47,31 @@ use wdmg\widgets\SelectInput;
     </div>
     <?php ActiveForm::end(); ?>
 </div>
+
+<?php $this->registerJs(<<< JS
+$(document).ready(function() {
+    function afterValidateAttribute(event, attribute, messages)
+    {
+        if (attribute.name && !attribute.alias && messages.length == 0) {
+            var form = $(event.target);
+            $.ajax({
+                    type: form.attr('method'),
+                    url: form.attr('action'),
+                    data: form.serializeArray(),
+                }
+            ).done(function(data) {
+                if (data.alias && form.find('#pages-alias').val().length == 0) {
+                    form.find('#pages-alias').val(data.alias);
+                    form.yiiActiveForm('validateAttribute', 'pages-alias');
+                }
+            }).fail(function () {
+                /*form.find('#options-type').val("");
+                form.find('#options-type').trigger('change');*/
+            });
+            return false; // prevent default form submission
+        }
+    }
+    $("#addPageForm").on("afterValidateAttribute", afterValidateAttribute);
+});
+JS
+); ?>

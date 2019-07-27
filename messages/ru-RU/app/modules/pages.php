@@ -19,6 +19,7 @@ return [
     'Created by' => "Автор создания",
     'Updated by' => "Автор изменений",
 
+    'Page URL' => "URL страницы",
     'View page' => "Просмотр страницы",
     'All pages' => "Все страницы",
     'Updating page: {name}' => "Редактирование страницы: {name}",
@@ -34,6 +35,10 @@ return [
     'Published' => "Опубликовано",
 
     'by default' => "по-умолчанию",
+
+    'It allowed only Latin alphabet, numbers and the «-», «_», «/» characters.' => "Разрешена только латинница, цифры и «-», «_», «/» символы.",
+    'It allowed only Latin alphabet, numbers and the «@», «-», «_», «/» characters.' => "Разрешена только латинница, цифры и «@», «-», «_», «/» символы.",
+    'It allowed only Latin alphabet, numbers and the «-», «_» characters.' => "Разрешена только латинница, цифры и «-», «_» символы.",
 
     'Create page' => "Создание страницы",
     'Add new page' => "Добавить страницу",

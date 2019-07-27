@@ -10,6 +10,7 @@ use yii\helpers\Json;
 use yii\base\InvalidArgumentException;
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\BlameableBehavior;
+use yii\behaviors\SluggableBehavior;
 
 /**
  * This is the model class for table "{{%pages}}".
@@ -32,6 +33,7 @@ use yii\behaviors\BlameableBehavior;
 class Pages extends ActiveRecord
 {
 
+    public $pageUrl;
     const PAGE_STATUS_DRAFT = 0; // Page has draft
     const PAGE_STATUS_PUBLISHED = 1; // Page has been published
 
@@ -62,6 +64,17 @@ class Pages extends ActiveRecord
                 'createdByAttribute' => 'created_by',
                 'updatedByAttribute' => 'updated_by',
             ],
+            'sluggable' =>  [
+                'class' => SluggableBehavior::className(),
+                'attribute' => ['name'],
+                'slugAttribute' => 'alias',
+                'ensureUnique' => true,
+                'skipOnEmpty' => true,
+                'immutable' => true,
+                'value' => function ($event) {
+                    return mb_substr($this->name, 0, 32);
+                }
+            ],
         ];
     }
 
@@ -77,9 +90,13 @@ class Pages extends ActiveRecord
             [['title', 'description', 'keywords'], 'string', 'max' => 255],
             [['status'], 'boolean'],
             ['route', 'string', 'max' => 32],
+            ['route', 'match', 'pattern' => '/^[A-Za-z0-9\-\_\/]+$/', 'message' => Yii::t('app/modules/pages','It allowed only Latin alphabet, numbers and the «-», «_», «/» characters.')],
+
             ['layout', 'string', 'max' => 64],
+            ['layout', 'match', 'pattern' => '/^[A-Za-z0-9\-\_\/\@]+$/', 'message' => Yii::t('app/modules/pages','It allowed only Latin alphabet, numbers and the «@», «-», «_», «/» characters.')],
+
             ['alias', 'unique', 'message' => Yii::t('app/modules/pages', 'Param attribute must be unique.')],
-            ['alias', 'match', 'pattern' => '/^[A-Za-z0-9\-]+$/', 'message' => Yii::t('app/modules/pages','It allowed only Latin alphabet, numbers and the «-» character')],
+            ['alias', 'match', 'pattern' => '/^[A-Za-z0-9\-\_]+$/', 'message' => Yii::t('app/modules/pages','It allowed only Latin alphabet, numbers and the «-», «_» characters.')],
             [['created_at', 'updated_at'], 'safe'],
         ];
 
@@ -98,6 +115,7 @@ class Pages extends ActiveRecord
             'id' => Yii::t('app/modules/pages', 'ID'),
             'name' => Yii::t('app/modules/pages', 'Name'),
             'alias' => Yii::t('app/modules/pages', 'Alias'),
+            'pageUrl' => Yii::t('app/modules/pages', 'Page URL'),
             'content' => Yii::t('app/modules/pages', 'Content'),
             'title' => Yii::t('app/modules/pages', 'Title'),
             'description' => Yii::t('app/modules/pages', 'Description'),
@@ -130,7 +148,6 @@ class Pages extends ActiveRecord
         return parent::beforeSave($insert);
     }
 
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -147,6 +164,35 @@ class Pages extends ActiveRecord
                 self::PAGE_STATUS_DRAFT => Yii::t('app/modules/pages', 'Draft'),
                 self::PAGE_STATUS_PUBLISHED => Yii::t('app/modules/pages', 'Published'),
             ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getRoute()
+    {
+        if (isset($this->route)) {
+            $route = $this->route;
+        } else {
+            if (is_array(Yii::$app->controller->module->pagesRoute)) {
+                $route = array_shift(Yii::$app->controller->module->pagesRoute);
+            } else {
+                $route = Yii::$app->controller->module->pagesRoute;
+            }
+        }
+        return $route;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPageUrl()
+    {
+        if (isset($this->alias)) {
+            return \yii\helpers\Url::to(self::getRoute() . '/' .$this->alias, true);
+        } else {
+            return null;
+        }
     }
 
     /**

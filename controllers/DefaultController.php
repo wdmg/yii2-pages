@@ -39,8 +39,11 @@ class DefaultController extends Controller
     public function actionIndex($page, $route = null)
     {
 
-        if (is_null($route))
-            $route = str_replace('/'.$page, '', Yii::$app->request->url);
+        // Separate route from page alias from request URL
+        if (is_null($route) && preg_match('/^([\/]+[A-Za-z0-9_\-\_\/]+[\/])*([A-Za-z0-9_\-\_]*)/i', Yii::$app->request->url,$matches)) {
+            if ($page == $matches[2])
+                $route = rtrim($matches[1], '/');
+        }
 
         // If route is root
         if (empty($route))

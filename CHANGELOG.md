@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## 1.1.1 (2019-07-28)
+ * Fixing route detection
+ * Added sluggable behavior for aliases
+
 ## 1.1.0 (2019-07-27)
  * Added routing functionality
 

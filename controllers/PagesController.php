@@ -90,20 +90,31 @@ class PagesController extends Controller
         $model->route = null;
         $model->layout = null;
 
-        if ($model->load(Yii::$app->request->post())) {
+        if (Yii::$app->request->isAjax) {
+            if ($model->load(Yii::$app->request->post())) {
+                if ($model->validate())
+                    $success = true;
+                else
+                    $success = false;
 
-            if($model->save())
-                Yii::$app->getSession()->setFlash(
-                    'success',
-                    Yii::t('app/modules/pages', 'Page has been successfully addedet!')
-                );
-            else
-                Yii::$app->getSession()->setFlash(
-                    'danger',
-                    Yii::t('app/modules/pages', 'An error occurred while add the page.')
-                );
+                return $this->asJson(['success' => $success, 'alias' => $model->alias, 'errors' => $model->errors]);
+            }
+        } else {
+            if ($model->load(Yii::$app->request->post())) {
 
-            return $this->redirect(['pages/index']);
+                if($model->save())
+                    Yii::$app->getSession()->setFlash(
+                        'success',
+                        Yii::t('app/modules/pages', 'Page has been successfully addedet!')
+                    );
+                else
+                    Yii::$app->getSession()->setFlash(
+                        'danger',
+                        Yii::t('app/modules/pages', 'An error occurred while add the page.')
+                    );
+
+                return $this->redirect(['pages/index']);
+            }
         }
 
         return $this->render('create', [
@@ -125,36 +136,48 @@ class PagesController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+        /*if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return ActiveForm::validate($model);
-        }
+        }*/
 
-        if ($model->load(Yii::$app->request->post())) {
-            if($model->save()) {
-                Yii::$app->getSession()->setFlash(
-                    'success',
-                    Yii::t(
-                        'app/modules/pages',
-                        'OK! Page `{name}` successfully updated.',
-                        [
-                            'name' => $model->name
-                        ]
-                    )
-                );
-            } else {
-                Yii::$app->getSession()->setFlash(
-                    'danger',
-                    Yii::t(
-                        'app/modules/pages',
-                        'An error occurred while update a page `{name}`.',
-                        [
-                            'name' => $model->name
-                        ]
-                    )
-                );
+        if (Yii::$app->request->isAjax) {
+            if ($model->load(Yii::$app->request->post())) {
+                if ($model->validate())
+                    $success = true;
+                else
+                    $success = false;
+
+                return $this->asJson(['success' => $success, 'alias' => $model->alias, 'errors' => $model->errors]);
             }
-            return $this->redirect(['index']);
+        } else {
+
+            if ($model->load(Yii::$app->request->post())) {
+                if($model->save()) {
+                    Yii::$app->getSession()->setFlash(
+                        'success',
+                        Yii::t(
+                            'app/modules/pages',
+                            'OK! Page `{name}` successfully updated.',
+                            [
+                                'name' => $model->name
+                            ]
+                        )
+                    );
+                } else {
+                    Yii::$app->getSession()->setFlash(
+                        'danger',
+                        Yii::t(
+                            'app/modules/pages',
+                            'An error occurred while update a page `{name}`.',
+                            [
+                                'name' => $model->name
+                            ]
+                        )
+                    );
+                }
+                return $this->redirect(['index']);
+            }
         }
 
         return $this->render('update', [
