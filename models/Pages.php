@@ -32,8 +32,6 @@ use yii\behaviors\SluggableBehavior;
  */
 class Pages extends ActiveRecord
 {
-
-    public $pageUrl;
     const PAGE_STATUS_DRAFT = 0; // Page has draft
     const PAGE_STATUS_PUBLISHED = 1; // Page has been published
 
@@ -115,7 +113,6 @@ class Pages extends ActiveRecord
             'id' => Yii::t('app/modules/pages', 'ID'),
             'name' => Yii::t('app/modules/pages', 'Name'),
             'alias' => Yii::t('app/modules/pages', 'Alias'),
-            'pageUrl' => Yii::t('app/modules/pages', 'Page URL'),
             'content' => Yii::t('app/modules/pages', 'Content'),
             'title' => Yii::t('app/modules/pages', 'Title'),
             'description' => Yii::t('app/modules/pages', 'Description'),
@@ -171,8 +168,11 @@ class Pages extends ActiveRecord
      */
     public function getRoute()
     {
-        if (isset($this->route)) {
-            $route = $this->route;
+        if (!is_null($this->route)) {
+            if ($this->route == '/')
+                $route = '';
+            else
+                $route = $this->route;
         } else {
             if (is_array(Yii::$app->controller->module->pagesRoute)) {
                 $route = array_shift(Yii::$app->controller->module->pagesRoute);
@@ -184,19 +184,24 @@ class Pages extends ActiveRecord
     }
 
     /**
-     * @return string
+     *
+     * @param $withScheme boolean, absolute or relative URL
+     * @return string or null
      */
-    public function getPageUrl()
+    public function getPageUrl($withScheme = true)
     {
+        $this->route = $this->getRoute();
         if (isset($this->alias)) {
-            return \yii\helpers\Url::to(self::getRoute() . '/' .$this->alias, true);
+            return \yii\helpers\Url::to($this->route . '/' .$this->alias, $withScheme);
         } else {
             return null;
         }
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     *
+     * @param $asArray boolean, return results as array
+     * @return array or object of \yii\db\ActiveQuery
      */
     public function getRoutes($asArray = false)
     {
@@ -207,7 +212,7 @@ class Pages extends ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return object of \yii\db\ActiveQuery
      */
     public function getUser()
     {

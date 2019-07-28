@@ -2,6 +2,7 @@ Changelog
 =========
 
 ## 1.1.1 (2019-07-28)
+ * Added support of redirects
  * Fixing route detection
  * Added sluggable behavior for aliases
 

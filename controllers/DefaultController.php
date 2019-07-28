@@ -19,6 +19,7 @@ class DefaultController extends Controller
      */
     public function beforeAction($action)
     {
+
         // Set a default layout
         $this->layout = $this->module->pagesLayout;
 
@@ -38,6 +39,10 @@ class DefaultController extends Controller
      */
     public function actionIndex($page, $route = null)
     {
+
+        // Check probably need redirect to new page URL
+        if (Yii::$app->redirects->check(Yii::$app->request->getUrl()))
+            return Yii::$app->redirects->check(Yii::$app->request->getUrl());
 
         // Separate route from page alias from request URL
         if (is_null($route) && preg_match('/^([\/]+[A-Za-z0-9_\-\_\/]+[\/])*([A-Za-z0-9_\-\_]*)/i', Yii::$app->request->url,$matches)) {

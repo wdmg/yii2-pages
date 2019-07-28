@@ -136,10 +136,9 @@ class PagesController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        /*if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            return ActiveForm::validate($model);
-        }*/
+
+        // Get current URL before save this page
+        $oldPageUrl = $model->getPageUrl(false);
 
         if (Yii::$app->request->isAjax) {
             if ($model->load(Yii::$app->request->post())) {
@@ -151,9 +150,19 @@ class PagesController extends Controller
                 return $this->asJson(['success' => $success, 'alias' => $model->alias, 'errors' => $model->errors]);
             }
         } else {
-
             if ($model->load(Yii::$app->request->post())) {
+
+                // Get new URL for saved page
+                $newPageUrl = $model->getPageUrl(false);
+
                 if($model->save()) {
+
+                    // Set 301-redirect from old URL to new
+                    if (($oldPageUrl !== $newPageUrl) && ($model->status == $model::PAGE_STATUS_PUBLISHED)) {
+                        // @TODO: remove old redirects
+                        Yii::$app->redirects->set('pages', $oldPageUrl, $newPageUrl, 301);
+                    }
+
                     Yii::$app->getSession()->setFlash(
                         'success',
                         Yii::t(
@@ -213,6 +222,9 @@ class PagesController extends Controller
 
         $model = $this->findModel($id);
         if($model->delete()) {
+
+            // @TODO: remove redirects of deleted pages
+
             Yii::$app->getSession()->setFlash(
                 'success',
                 Yii::t(
