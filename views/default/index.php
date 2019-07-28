@@ -6,7 +6,7 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $model wdmg\pages\models\Pages */
 
-if (empty($model->title))
+if (!empty($model->title))
     $this->title = $model->title;
 else
     $this->title = $model->name;

@@ -41,8 +41,10 @@ class DefaultController extends Controller
     {
 
         // Check probably need redirect to new page URL
-        if (Yii::$app->redirects->check(Yii::$app->request->getUrl()))
-            return Yii::$app->redirects->check(Yii::$app->request->getUrl());
+        if (isset(Yii::$app->redirects)) {
+            if (Yii::$app->redirects->check(Yii::$app->request->getUrl()))
+                return Yii::$app->redirects->check(Yii::$app->request->getUrl());
+        }
 
         // Separate route from page alias from request URL
         if (is_null($route) && preg_match('/^([\/]+[A-Za-z0-9_\-\_\/]+[\/])*([A-Za-z0-9_\-\_]*)/i', Yii::$app->request->url,$matches)) {

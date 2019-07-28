@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## 1.1.2 (2019-07-29)
+ * Bugfix in composer.json, controllers and view
+
 ## 1.1.1 (2019-07-28)
  * Added support of redirects
  * Fixing route detection

@@ -158,7 +158,7 @@ class PagesController extends Controller
                 if($model->save()) {
 
                     // Set 301-redirect from old URL to new
-                    if (($oldPageUrl !== $newPageUrl) && ($model->status == $model::PAGE_STATUS_PUBLISHED)) {
+                    if (isset(Yii::$app->redirects) && ($oldPageUrl !== $newPageUrl) && ($model->status == $model::PAGE_STATUS_PUBLISHED)) {
                         // @TODO: remove old redirects
                         Yii::$app->redirects->set('pages', $oldPageUrl, $newPageUrl, 301);
                     }

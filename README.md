@@ -62,6 +62,6 @@ Use the `Module::dashboardNavItems()` method of the module to generate a navigat
     ?>
 
 # Status and version [in progress development]
+* v.1.1.2 - Bugfix in composer.json, controllers and view
 * v.1.1.1 - Added support of redirects, fixing route detection and added sluggable behavior for aliases
 * v.1.1.0 - Added routing functionality
-* v.1.0.1 - Added default route and layout for rendered page
