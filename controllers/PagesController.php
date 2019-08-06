@@ -105,7 +105,7 @@ class PagesController extends Controller
                 if($model->save())
                     Yii::$app->getSession()->setFlash(
                         'success',
-                        Yii::t('app/modules/pages', 'Page has been successfully addedet!')
+                        Yii::t('app/modules/pages', 'Page has been successfully added!')
                     );
                 else
                     Yii::$app->getSession()->setFlash(
@@ -123,8 +123,6 @@ class PagesController extends Controller
         ]);
 
     }
-
-
 
     /**
      * Updates an existing Page model.

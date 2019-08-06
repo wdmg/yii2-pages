@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## 1.1.3 (2019-08-06)
+ * Minor bug fixies
+
 ## 1.1.2 (2019-07-29)
  * Bugfix in composer.json, controllers and view
 

@@ -53,7 +53,7 @@ return [
 
     'The requested page does not exist.' => "Запрошенная страница не существует.",
 
-    'Page has been successfully addedet!' => "Страница была успешно добавлена!",
+    'Page has been successfully added!' => "Страница была успешно добавлена!",
     'An error occurred while add the page.' => "Произошла ошибка при добавлении страницы.",
 
 ];

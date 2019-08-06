@@ -46,7 +46,7 @@ class DefaultController extends Controller
                 return Yii::$app->redirects->check(Yii::$app->request->getUrl());
         }
 
-        // Separate route from page alias from request URL
+        // Separate route from request URL
         if (is_null($route) && preg_match('/^([\/]+[A-Za-z0-9_\-\_\/]+[\/])*([A-Za-z0-9_\-\_]*)/i', Yii::$app->request->url,$matches)) {
             if ($page == $matches[2])
                 $route = rtrim($matches[1], '/');

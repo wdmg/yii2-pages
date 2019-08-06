@@ -38,6 +38,21 @@ class m190725_005152_pages extends Migration
 
         $this->createIndex('{{%idx-pages-alias}}', '{{%pages}}', ['name', 'alias']);
         $this->createIndex('{{%idx-pages-status}}', '{{%pages}}', ['alias', 'status']);
+        $this->createIndex('{{%idx-pages-author}}','{{%pages}}', ['created_by', 'updated_by'],false);
+
+        // If exist module `Users` set foreign key `created_by`, `updated_by` to `users.id`
+        if(class_exists('\wdmg\users\models\Users') && isset(Yii::$app->modules['users'])) {
+            $userTable = \wdmg\users\models\Users::tableName();
+            $this->addForeignKey(
+                'fk_pages_to_users',
+                '{{%pages}}',
+                'created_by, updated_by',
+                $userTable,
+                'id',
+                'NO ACTION',
+                'CASCADE'
+            );
+        }
 
     }
 
@@ -46,9 +61,21 @@ class m190725_005152_pages extends Migration
      */
     public function safeDown()
     {
-        $this->truncateTable('{{%pages}}');
         $this->dropIndex('{{%idx-pages-alias}}', '{{%pages}}');
         $this->dropIndex('{{%idx-pages-status}}', '{{%pages}}');
+        $this->dropIndex('{{%idx-pages-author}}', '{{%pages}}');
+
+        if(class_exists('\wdmg\users\models\Users') && isset(Yii::$app->modules['users'])) {
+            $userTable = \wdmg\users\models\Users::tableName();
+            if (!(Yii::$app->db->getTableSchema($userTable, true) === null)) {
+                $this->dropForeignKey(
+                    'fk_pages_to_users',
+                    '{{%pages}}'
+                );
+            }
+        }
+
+        $this->truncateTable('{{%pages}}');
         $this->dropTable('{{%pages}}');
     }
 
