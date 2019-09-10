@@ -48,7 +48,7 @@ class Pages extends ActiveRecord
      */
     public function behaviors()
     {
-        return [
+        $behaviors = [
             'timestamp' => [
                 'class' => TimestampBehavior::className(),
                 'attributes' => [
@@ -56,11 +56,6 @@ class Pages extends ActiveRecord
                     ActiveRecord::EVENT_BEFORE_UPDATE => 'updated_at',
                 ],
                 'value' => new Expression('NOW()'),
-            ],
-            'blameable' => [
-                'class' => BlameableBehavior::className(),
-                'createdByAttribute' => 'created_by',
-                'updatedByAttribute' => 'updated_by',
             ],
             'sluggable' =>  [
                 'class' => SluggableBehavior::className(),
@@ -74,6 +69,16 @@ class Pages extends ActiveRecord
                 }
             ],
         ];
+
+        if (class_exists('\wdmg\users\models\Users') && isset(Yii::$app->modules['users'])) {
+            $behaviors['blameable'] = [
+                'class' => BlameableBehavior::className(),
+                'createdByAttribute' => 'created_by',
+                'updatedByAttribute' => 'updated_by',
+            ];
+        }
+
+        return $behaviors;
     }
 
     /**
@@ -98,7 +103,7 @@ class Pages extends ActiveRecord
             [['created_at', 'updated_at'], 'safe'],
         ];
 
-        if(class_exists('\wdmg\users\models\Users') && isset(Yii::$app->modules['users'])) {
+        if (class_exists('\wdmg\users\models\Users') && isset(Yii::$app->modules['users'])) {
             $rules[] = [['created_by', 'updated_by'], 'required'];
         }
 
