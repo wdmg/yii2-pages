@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## 1.1.4 (2019-10-10)
+ * Migrations fixies
+ 
 ## 1.1.3 (2019-08-06)
  * Minor bug fixies
 
