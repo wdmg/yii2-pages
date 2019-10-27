@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## 1.1.5 (2019-10-28)
+ * Added hasMany for Users, some translations
+ 
 ## 1.1.4 (2019-10-10)
  * Migrations fixies
  

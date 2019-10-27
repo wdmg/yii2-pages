@@ -221,8 +221,19 @@ class Pages extends ActiveRecord
      */
     public function getUser()
     {
-        if(class_exists('\wdmg\users\models\Users') && isset(Yii::$app->modules['users']))
+        if(class_exists('\wdmg\users\models\Users'))
             return $this->hasOne(\wdmg\users\models\Users::className(), ['id' => 'created_by']);
+        else
+            return null;
+    }
+
+    /**
+     * @return object of \yii\db\ActiveQuery
+     */
+    public function getUsers()
+    {
+        if(class_exists('\wdmg\users\models\Users'))
+            return $this->hasMany(\wdmg\users\models\Users::className(), ['id' => 'created_by']);
         else
             return null;
     }

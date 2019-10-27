@@ -28,6 +28,9 @@ return [
     'Actions' => "Действия",
     'Params' => "Параметры",
 
+    'No pages available for display' => "Нет доступных для отображения страниц",
+    'An error occurred while retrieving the page list' => "Произошла ошибка при получении списка страниц",
+
     'Field exceeds the recommended length of {length} characters.' => "Поле превышает рекомендуемую длину в {length} символов.",
 
     'All statuses' => "Все статусы",

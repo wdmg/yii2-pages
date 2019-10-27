@@ -61,7 +61,8 @@ Use the `Module::dashboardNavItems()` method of the module to generate a navigat
         ]);
     ?>
 
-# Status and version [in progress development]
+# Status and version [ready to use]
+* v.1.1.5 - Added hasMany for Users, some translations
 * v.1.1.4 - Migrations fixies
 * v.1.1.3 - Minor bug fixies
 * v.1.1.2 - Bugfix in composer.json, controllers and view
