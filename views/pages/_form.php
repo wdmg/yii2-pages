@@ -25,14 +25,14 @@ use wdmg\widgets\SelectInput;
             ])) . '<br/>';
     ?>
     <?= $form->field($model, 'alias')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'content')->widget(Editor::className(), [
+    <?= $form->field($model, 'content')->widget(Editor::class, [
         'options' => [],
         'pluginOptions' => []
     ]) ?>
     <?= $form->field($model, 'title')->textInput() ?>
     <?= $form->field($model, 'description')->textarea(['rows' => 3]) ?>
     <?= $form->field($model, 'keywords')->textarea(['rows' => 3]) ?>
-    <?= $form->field($model, 'status')->widget(SelectInput::className(), [
+    <?= $form->field($model, 'status')->widget(SelectInput::class, [
         'items' => $statusModes,
         'options' => [
             'class' => 'form-control'
