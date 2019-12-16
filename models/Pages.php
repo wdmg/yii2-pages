@@ -134,12 +134,12 @@ class Pages extends ActiveRecord
      */
     public function beforeSave($insert)
     {
-        if(empty(trim($this->route)))
+        if (empty(trim($this->route)))
             $this->route = null;
         else
             $this->route = trim($this->route);
 
-        if(empty(trim($this->layout)))
+        if (empty(trim($this->layout)))
             $this->layout = null;
         else
             $this->layout = trim($this->layout);
@@ -152,7 +152,7 @@ class Pages extends ActiveRecord
      */
     public function getStatusesList($allStatuses = false)
     {
-        if($allStatuses)
+        if ($allStatuses)
             return [
                 '*' => Yii::t('app/modules/pages', 'All statuses'),
                 self::PAGE_STATUS_DRAFT => Yii::t('app/modules/pages', 'Draft'),
