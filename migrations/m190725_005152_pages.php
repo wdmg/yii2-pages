@@ -40,7 +40,7 @@ class m190725_005152_pages extends Migration
         $this->createIndex('{{%idx-pages-status}}', '{{%pages}}', ['alias', 'status']);
 
         // If exist module `Users` set index and foreign key `created_by`, `updated_by` to `users.id`
-        if(class_exists('\wdmg\users\models\Users') && isset(Yii::$app->modules['users'])) {
+        if (class_exists('\wdmg\users\models\Users') && isset(Yii::$app->modules['users'])) {
             $this->createIndex('{{%idx-pages-author}}','{{%pages}}', ['created_by', 'updated_by'],false);
             $userTable = \wdmg\users\models\Users::tableName();
             $this->addForeignKey(

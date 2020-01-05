@@ -35,6 +35,8 @@ class Pages extends ActiveRecord
     const PAGE_STATUS_DRAFT = 0; // Page has draft
     const PAGE_STATUS_PUBLISHED = 1; // Page has been published
 
+    public $url;
+
     /**
      * {@inheritdoc}
      */
@@ -88,7 +90,7 @@ class Pages extends ActiveRecord
             [['name', 'alias'], 'string', 'min' => 3, 'max' => 128],
             [['name', 'alias'], 'string', 'min' => 3, 'max' => 128],
             [['title', 'description', 'keywords'], 'string', 'max' => 255],
-            [['status'], 'boolean'],
+            [['status', 'in_sitemap'], 'boolean'],
             ['route', 'string', 'max' => 32],
             ['route', 'match', 'pattern' => '/^[A-Za-z0-9\-\_\/]+$/', 'message' => Yii::t('app/modules/pages','It allowed only Latin alphabet, numbers and the «-», «_», «/» characters.')],
 
@@ -119,6 +121,7 @@ class Pages extends ActiveRecord
             'title' => Yii::t('app/modules/pages', 'Title'),
             'description' => Yii::t('app/modules/pages', 'Description'),
             'keywords' => Yii::t('app/modules/pages', 'Keywords'),
+            'in_sitemap' => Yii::t('app/modules/pages', 'In sitemap?'),
             'status' => Yii::t('app/modules/pages', 'Status'),
             'route' => Yii::t('app/modules/pages', 'Route'),
             'layout' => Yii::t('app/modules/pages', 'Layout'),
@@ -148,6 +151,18 @@ class Pages extends ActiveRecord
     }
 
     /**
+     * @inheritdoc
+     */
+    public function afterFind()
+    {
+        parent::afterFind();
+
+        if (is_null($this->url))
+            $this->url = $this->getUrl();
+
+    }
+
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getStatusesList($allStatuses = false)
@@ -170,16 +185,27 @@ class Pages extends ActiveRecord
      */
     public function getRoute()
     {
+
+        if (isset(Yii::$app->params["pages.pagesRoute"])) {
+            $pagesRoute = Yii::$app->params["pages.pagesRoute"];
+        } else {
+
+            if (!$module = Yii::$app->getModule('admin/pages'))
+                $module = Yii::$app->getModule('pages');
+
+            $pagesRoute = $module->pagesRoute;
+        }
+
         if (!is_null($this->route)) {
             if ($this->route == '/')
                 $route = '';
             else
                 $route = $this->route;
         } else {
-            if (is_array(Yii::$app->controller->module->pagesRoute)) {
-                $route = array_shift(Yii::$app->controller->module->pagesRoute);
+            if (is_array($pagesRoute)) {
+                $route = array_shift($pagesRoute);
             } else {
-                $route = Yii::$app->controller->module->pagesRoute;
+                $route = $pagesRoute;
             }
         }
         return $route;
@@ -233,5 +259,40 @@ class Pages extends ActiveRecord
             return $this->hasMany(\wdmg\users\models\Users::class, ['id' => 'created_by']);
         else
             return null;
+    }
+
+    /**
+     * Returns published pages
+     *
+     * @param null $cond sampling conditions
+     * @param bool $asArray flag if necessary to return as an array
+     * @return array|ActiveRecord|null
+     */
+    public function getPublished($cond = null, $asArray = false) {
+        if (!is_null($cond) && is_array($cond))
+            $models = self::find()->where(ArrayHelper::merge($cond, ['status' => self::PAGE_STATUS_PUBLISHED]));
+        elseif (!is_null($cond) && is_string($cond))
+            $models = self::find()->where(ArrayHelper::merge([$cond], ['status' => self::PAGE_STATUS_PUBLISHED]));
+        else
+            $models = self::find()->where(['status' => self::PAGE_STATUS_PUBLISHED]);
+
+        if ($asArray)
+            return $models->asArray()->all();
+        else
+            return $models->all();
+
+    }
+
+    /**
+     * Returns the URL to the view of the current model
+     *
+     * @return string
+     */
+    public function getUrl()
+    {
+        if ($this->url === null)
+            $this->url = $this->getPageUrl();
+
+        return $this->url;
     }
 }

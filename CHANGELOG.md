@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## 1.1.7 (2020-01-05)
+ * Added support for Sitemap module
+ 
 ## 1.1.6 (2019-12-10)
  * Fixed deprecated class declaration
  

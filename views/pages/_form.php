@@ -32,6 +32,14 @@ use wdmg\widgets\SelectInput;
     <?= $form->field($model, 'title')->textInput() ?>
     <?= $form->field($model, 'description')->textarea(['rows' => 3]) ?>
     <?= $form->field($model, 'keywords')->textarea(['rows' => 3]) ?>
+
+    <?= $form->field($model, 'in_sitemap', [
+        'template' => "{label}\n<br/>{input}\n{hint}\n{error}"
+    ])
+        ->checkbox(['label' => Yii::t('app/modules/pages', '- display in the sitemap')])
+        ->label(Yii::t('app/modules/pages', 'Sitemap'))
+    ?>
+
     <?= $form->field($model, 'status')->widget(SelectInput::class, [
         'items' => $statusModes,
         'options' => [

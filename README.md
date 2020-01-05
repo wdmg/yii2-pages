@@ -62,6 +62,6 @@ Use the `Module::dashboardNavItems()` method of the module to generate a navigat
     ?>
 
 # Status and version [ready to use]
+* v.1.1.7 - Added support for Sitemap module
 * v.1.1.6 - Fixed deprecated class declaration
 * v.1.1.5 - Added hasMany for Users, some translations
-* v.1.1.4 - Migrations fixies

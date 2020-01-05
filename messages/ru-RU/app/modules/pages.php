@@ -28,6 +28,10 @@ return [
     'Actions' => "Действия",
     'Params' => "Параметры",
 
+    'Sitemap' => "Карта сайта",
+    '- display in the sitemap' => "- отображать в карте сайта",
+    'In sitemap?' => "В карте сайта?",
+
     'No pages available for display' => "Нет доступных для отображения страниц",
     'An error occurred while retrieving the page list' => "Произошла ошибка при получении списка страниц",
 

@@ -42,6 +42,16 @@ $this->params['breadcrumbs'][] = $this->title;
             'description:ntext',
             'keywords:ntext',
             [
+                'attribute' => 'in_sitemap',
+                'format' => 'html',
+                'value' => function($data) {
+                    if ($data->in_sitemap)
+                        return '<span class="fa fa-check text-success"></span>';
+                    else
+                        return '<span class="fa fa-remove text-danger"></span>';
+                }
+            ],
+            [
                 'attribute' => 'status',
                 'format' => 'html',
                 'value' => function($data) {
