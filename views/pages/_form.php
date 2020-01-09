@@ -35,9 +35,15 @@ use wdmg\widgets\SelectInput;
 
     <?= $form->field($model, 'in_sitemap', [
         'template' => "{label}\n<br/>{input}\n{hint}\n{error}"
-    ])
-        ->checkbox(['label' => Yii::t('app/modules/pages', '- display in the sitemap')])
-        ->label(Yii::t('app/modules/pages', 'Sitemap'))
+    ])->checkbox(['label' => Yii::t('app/modules/pages', '- display in the sitemap')])->label(Yii::t('app/modules/pages', 'Sitemap'))
+    ?>
+    <?= $form->field($model, 'in_turbo', [
+        'template' => "{label}\n<br/>{input}\n{hint}\n{error}"
+    ])->checkbox(['label' => Yii::t('app/modules/pages', '- display in the turbo-pages')])->label(Yii::t('app/modules/pages', 'Yandex turbo'))
+    ?>
+    <?= $form->field($model, 'in_amp', [
+        'template' => "{label}\n<br/>{input}\n{hint}\n{error}"
+    ])->checkbox(['label' => Yii::t('app/modules/pages', '- display in the AMP pages')])->label(Yii::t('app/modules/pages', 'Google AMP'))
     ?>
 
     <?= $form->field($model, 'status')->widget(SelectInput::class, [

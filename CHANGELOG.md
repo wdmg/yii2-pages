@@ -1,6 +1,8 @@
 Changelog
 =========
-
+## 1.1.8 (2020-01-09)
+ * Added support for Yandex.Turbo and Google AMP modules
+ 
 ## 1.1.7 (2020-01-05)
  * Added support for Sitemap module
  

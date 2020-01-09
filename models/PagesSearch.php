@@ -17,7 +17,7 @@ class PagesSearch extends Pages
     public function rules()
     {
         return [
-            [['id'], 'integer'],
+            [['id', 'in_sitemap', 'in_turbo', 'in_amp'], 'integer'],
             [['name', 'alias', 'title', 'description', 'keywords', 'status'], 'safe'],
         ];
     }
@@ -67,7 +67,16 @@ class PagesSearch extends Pages
             ->andFilterWhere(['like', 'description', $this->description])
             ->andFilterWhere(['like', 'keywords', $this->keywords]);
 
-        if($this->status !== "*")
+        if ($this->in_sitemap !== "*")
+            $query->andFilterWhere(['like', 'in_sitemap', $this->in_sitemap]);
+
+        if ($this->in_turbo !== "*")
+            $query->andFilterWhere(['like', 'in_turbo', $this->in_turbo]);
+
+        if ($this->in_amp !== "*")
+            $query->andFilterWhere(['like', 'in_amp', $this->in_amp]);
+
+        if ($this->status !== "*")
             $query->andFilterWhere(['like', 'status', $this->status]);
 
         return $dataProvider;

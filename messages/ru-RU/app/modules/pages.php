@@ -30,7 +30,13 @@ return [
 
     'Sitemap' => "Карта сайта",
     '- display in the sitemap' => "- отображать в карте сайта",
+    'Yandex turbo' => "Яндекс турбо",
+    '- display in the turbo-pages' => "- отображать в турбо-страницах",
     'In sitemap?' => "В карте сайта?",
+    'Yandex turbo-pages?' => "Яндекс турбо-страницы?",
+    'Google AMP' => "Google AMP",
+    'Google AMP?' => "Google AMP?",
+    '- display in the AMP pages' => "- отображать в AMP страницах",
 
     'No pages available for display' => "Нет доступных для отображения страниц",
     'An error occurred while retrieving the page list' => "Произошла ошибка при получении списка страниц",

@@ -22,7 +22,10 @@ use yii\behaviors\SluggableBehavior;
  * @property string $title
  * @property string $description
  * @property string $keywords
- * @property integer $status
+ * @property boolean $in_sitemap
+ * @property boolean $in_turbo
+ * @property boolean $in_amp
+ * @property boolean $status
  * @property string $route
  * @property string $layout
  * @property string $created_at
@@ -90,7 +93,7 @@ class Pages extends ActiveRecord
             [['name', 'alias'], 'string', 'min' => 3, 'max' => 128],
             [['name', 'alias'], 'string', 'min' => 3, 'max' => 128],
             [['title', 'description', 'keywords'], 'string', 'max' => 255],
-            [['status', 'in_sitemap'], 'boolean'],
+            [['status', 'in_sitemap', 'in_turbo', 'in_amp'], 'boolean'],
             ['route', 'string', 'max' => 32],
             ['route', 'match', 'pattern' => '/^[A-Za-z0-9\-\_\/]+$/', 'message' => Yii::t('app/modules/pages','It allowed only Latin alphabet, numbers and the «-», «_», «/» characters.')],
 
@@ -122,6 +125,8 @@ class Pages extends ActiveRecord
             'description' => Yii::t('app/modules/pages', 'Description'),
             'keywords' => Yii::t('app/modules/pages', 'Keywords'),
             'in_sitemap' => Yii::t('app/modules/pages', 'In sitemap?'),
+            'in_turbo' => Yii::t('app/modules/pages', 'Yandex turbo-pages?'),
+            'in_amp' => Yii::t('app/modules/pages', 'Google AMP?'),
             'status' => Yii::t('app/modules/pages', 'Status'),
             'route' => Yii::t('app/modules/pages', 'Route'),
             'layout' => Yii::t('app/modules/pages', 'Layout'),
@@ -275,6 +280,26 @@ class Pages extends ActiveRecord
             $models = self::find()->where(ArrayHelper::merge([$cond], ['status' => self::PAGE_STATUS_PUBLISHED]));
         else
             $models = self::find()->where(['status' => self::PAGE_STATUS_PUBLISHED]);
+
+        if ($asArray)
+            return $models->asArray()->all();
+        else
+            return $models->all();
+
+    }
+
+    /**
+     * Returns all pages (draft and published)
+     *
+     * @param null $cond sampling conditions
+     * @param bool $asArray flag if necessary to return as an array
+     * @return array|ActiveRecord|null
+     */
+    public function getAll($cond = null, $asArray = false) {
+        if (!is_null($cond))
+            $models = self::find()->where($cond);
+        else
+            $models = self::find();
 
         if ($asArray)
             return $models->asArray()->all();
