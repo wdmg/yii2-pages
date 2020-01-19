@@ -16,6 +16,7 @@ namespace wdmg\pages;
 
 use Yii;
 use wdmg\base\BaseModule;
+use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -126,14 +127,33 @@ class Module extends BaseModule
     {
         parent::bootstrap($app);
 
+        if (isset(Yii::$app->params["pages.pagesRoute"]))
+            $this->pagesRoute = Yii::$app->params["pages.pagesRoute"];
+
+        if (!isset($this->pagesRoute))
+            throw new InvalidConfigException("Required module property `pagesRoute` isn't set.");
+
         // Add routes to pages in frontend
-        $app->getUrlManager()->addRules([
-            [
-                'pattern' => '/<route:[\w-\/]+>/<page:[\w-]+>',
-                'route' => 'admin/pages/default',
-                'suffix' => ''
-            ],
-            '/<route:[\w-\/]+>/<page:[\w-]+>' => 'admin/pages/default'
-        ], true);
+        $pagesRoute = $this->pagesRoute;
+        if (empty($pagesRoute) || $pagesRoute == "/") {
+            $app->getUrlManager()->addRules([
+                [
+                    'pattern' => '/<route:[\w-\/]+>/<page:[\w-]+>',
+                    'route' => 'admin/pages/default',
+                    'suffix' => ''
+                ],
+                '/<route:[\w-\/]+>/<page:[\w-]+>' => 'admin/pages/default',
+            ], true);
+        } else if (is_string($pagesRoute)) {
+            $app->getUrlManager()->addRules([
+                [
+                    'pattern' => $pagesRoute . '/<route:[\w-\/]+>/<page:[\w-]+>',
+                    'route' => 'admin/pages/default',
+                    'suffix' => ''
+                ],
+                $pagesRoute . '/<route:[\w-\/]+>/<page:[\w-]+>' => 'admin/pages/default'
+            ], true);
+        }
+
     }
 }

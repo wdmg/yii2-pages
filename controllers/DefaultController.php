@@ -43,6 +43,8 @@ class DefaultController extends Controller
     public function actionIndex($page, $route = null, $draft = false)
     {
 
+        $module = $this->module;
+
         // Check probably need redirect to new page URL
         if (isset(Yii::$app->redirects)) {
             if (Yii::$app->redirects->check(Yii::$app->request->getUrl()))
@@ -64,8 +66,13 @@ class DefaultController extends Controller
         if (empty($route))
             $route = '/';
 
+        // Add default route to path
+        if ($module->pagesRoute)
+            $route = $module->pagesRoute . $route;
+
         // Search page model with alias
-        $model = $this->findModel($page, $route, $draft);
+        if (!($model = $this->findModel($page, $route, $draft)))
+            throw new NotFoundHttpException();
 
         // Checking requested route with page route if set
         if (isset($model->route)) {
