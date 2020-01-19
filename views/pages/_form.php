@@ -52,7 +52,19 @@ use wdmg\widgets\SelectInput;
             'class' => 'form-control'
         ]
     ]); ?>
-    <?= $form->field($model, 'route')->textInput(['placeholder' => (is_null($model->route)) ? ((is_array($this->context->module->pagesRoute)) ? array_shift($this->context->module->pagesRoute) : $this->context->module->pagesRoute) : false]) ?>
+
+    <?= $form->field($model, 'parent_id')->widget(SelectInput::class, [
+        'items' => $parentsList,
+        'options' => [
+            'class' => 'form-control'
+        ]
+    ]); ?>
+
+    <?= $form->field($model, 'route')->textInput([
+        'placeholder' => (is_null($model->route)) ? ((is_array($this->context->module->pagesRoute)) ? array_shift($this->context->module->pagesRoute) : $this->context->module->pagesRoute) : false,
+        'disabled' => (!is_null($model->parent_id)) ? true : false
+    ]) ?>
+
     <?= $form->field($model, 'layout')->textInput(['placeholder' => (is_null($model->layout)) ? ((isset($this->context->module->pagesLayout)) ? $this->context->module->pagesLayout : '') : false]) ?>
     <hr/>
     <div class="form-group">

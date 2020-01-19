@@ -16,6 +16,7 @@ use yii\behaviors\SluggableBehavior;
  * This is the model class for table "{{%pages}}".
  *
  * @property int $id
+ * @property int $parent_id
  * @property string $name
  * @property string $alias
  * @property string $content
@@ -89,11 +90,13 @@ class Pages extends ActiveRecord
     public function rules()
     {
         $rules = [
+            ['parent_id', 'integer'],
             [['name', 'alias', 'content'], 'required'],
             [['name', 'alias'], 'string', 'min' => 3, 'max' => 128],
             [['name', 'alias'], 'string', 'min' => 3, 'max' => 128],
             [['title', 'description', 'keywords'], 'string', 'max' => 255],
             [['status', 'in_sitemap', 'in_turbo', 'in_amp'], 'boolean'],
+
             ['route', 'string', 'max' => 32],
             ['route', 'match', 'pattern' => '/^[A-Za-z0-9\-\_\/]+$/', 'message' => Yii::t('app/modules/pages','It allowed only Latin alphabet, numbers and the «-», «_», «/» characters.')],
 
@@ -118,6 +121,7 @@ class Pages extends ActiveRecord
     {
         return [
             'id' => Yii::t('app/modules/pages', 'ID'),
+            'parent_id' => Yii::t('app/modules/pages', 'Parent ID'),
             'name' => Yii::t('app/modules/pages', 'Name'),
             'alias' => Yii::t('app/modules/pages', 'Alias'),
             'content' => Yii::t('app/modules/pages', 'Content'),
@@ -152,6 +156,14 @@ class Pages extends ActiveRecord
         else
             $this->layout = trim($this->layout);
 
+        if ($this->parent_id == 0)
+            $this->parent_id = null;
+        else
+            $this->parent_id = intval($this->parent_id);
+
+        if (!is_null($this->parent_id))
+            $this->route = $this->getRoute();
+
         return parent::beforeSave($insert);
     }
 
@@ -161,78 +173,114 @@ class Pages extends ActiveRecord
     public function afterFind()
     {
         parent::afterFind();
-
-        if (is_null($this->url))
-            $this->url = $this->getUrl();
-
+        $this->url = $this->getPageUrl();
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return array
      */
     public function getStatusesList($allStatuses = false)
     {
-        if ($allStatuses)
-            return [
-                '*' => Yii::t('app/modules/pages', 'All statuses'),
-                self::PAGE_STATUS_DRAFT => Yii::t('app/modules/pages', 'Draft'),
-                self::PAGE_STATUS_PUBLISHED => Yii::t('app/modules/pages', 'Published'),
+        $list = [];
+        if ($allStatuses) {
+            $list = [
+                '*' => Yii::t('app/modules/pages', 'All statuses')
             ];
-        else
-            return [
-                self::PAGE_STATUS_DRAFT => Yii::t('app/modules/pages', 'Draft'),
-                self::PAGE_STATUS_PUBLISHED => Yii::t('app/modules/pages', 'Published'),
-            ];
+        }
+
+        $list = ArrayHelper::merge($list, [
+            self::PAGE_STATUS_DRAFT => Yii::t('app/modules/pages', 'Draft'),
+            self::PAGE_STATUS_PUBLISHED => Yii::t('app/modules/pages', 'Published'),
+        ]);
+
+        return $list;
     }
 
     /**
-     * @return string
+     * @param bool $allLabel
+     * @param bool $rootLabel
+     * @return array
      */
-    public function getRoute()
+    public function getParentsList($allLabel = true, $rootLabel = false)
     {
 
-        if (isset(Yii::$app->params["pages.pagesRoute"])) {
-            $pagesRoute = Yii::$app->params["pages.pagesRoute"];
+        if ($this->id) {
+            $subQuery = self::find()->select('id')->where(['parent_id' => $this->id]);
+            $query = self::find()->alias('pages')
+                ->where(['not in', 'pages.parent_id', $subQuery])
+                ->andWhere(['!=', 'pages.parent_id', $this->id])
+                ->orWhere(['IS', 'pages.parent_id', null])
+                ->andWhere(['!=', 'pages.id', $this->id])
+                ->select(['id', 'name']);
+
+            $pages = $query->asArray()->all();
         } else {
-
-            if (!$module = Yii::$app->getModule('admin/pages'))
-                $module = Yii::$app->getModule('pages');
-
-            $pagesRoute = $module->pagesRoute;
+            $pages = self::find()->select(['id', 'name'])->asArray()->all();
         }
 
-        if (!is_null($this->route)) {
-            if ($this->route == '/')
-                $route = '';
-            else
-                $route = $this->route;
-        } else {
-            if (is_array($pagesRoute)) {
-                $route = array_shift($pagesRoute);
+        if ($allLabel)
+            return ArrayHelper::merge([
+                '*' => Yii::t('app/modules/pages', '-- All pages --')
+            ], ArrayHelper::map($pages, 'id', 'name'));
+        elseif ($rootLabel)
+            return ArrayHelper::merge([
+                0 => Yii::t('app/modules/pages', '-- Root page --')
+            ], ArrayHelper::map($pages, 'id', 'name'));
+        else
+            return ArrayHelper::map($pages, 'id', 'name');
+    }
+
+    /**
+     * Return the public route for pages URL
+     * @return string
+     */
+    private function getRoute($route = null)
+    {
+
+        if (is_null($route)) {
+            if (isset(Yii::$app->params["pages.pagesRoute"])) {
+                $route = Yii::$app->params["pages.pagesRoute"];
             } else {
-                $route = $pagesRoute;
+
+                if (!$module = Yii::$app->getModule('admin/pages'))
+                    $module = Yii::$app->getModule('pages');
+
+                $route = $module->pagesRoute;
             }
         }
+
+        if ($this->parent_id) {
+            if ($parent = self::find()->where(['id' => intval($this->parent_id)])->one())
+                return $parent->getRoute($route) ."/". $parent->alias;
+
+        }
+
         return $route;
     }
 
     /**
+     * Build and return the URL for current page for frontend
      *
-     * @param $withScheme boolean, absolute or relative URL
-     * @return string or null
+     * @param bool $withScheme
+     * @param bool $realUrl
+     * @return null|string
      */
-    public function getPageUrl($withScheme = true)
+    public function getPageUrl($withScheme = true, $realUrl = true)
     {
         $this->route = $this->getRoute();
         if (isset($this->alias)) {
-            return \yii\helpers\Url::to($this->route . '/' .$this->alias, $withScheme);
+            if ($this->status == self::PAGE_STATUS_DRAFT && $realUrl)
+                return \yii\helpers\Url::to(['default/index', 'route' => $this->route, 'page' => $this->alias, 'draft' => 'true'], $withScheme);
+            else
+                return \yii\helpers\Url::to($this->route . '/' .$this->alias, $withScheme);
+
         } else {
             return null;
         }
     }
 
     /**
-     *
+     * Return the public routes for URL
      * @param $asArray boolean, return results as array
      * @return array or object of \yii\db\ActiveQuery
      */

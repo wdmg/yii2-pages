@@ -3,6 +3,7 @@
 namespace wdmg\pages\controllers;
 
 use Yii;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use wdmg\pages\models\Pages;
@@ -33,11 +34,13 @@ class DefaultController extends Controller
      * If the page does not have a route, such a check is not performed and the page can be
      * displayed if such a route is allowed as the default setting in the module.
      *
-     * @param string $page aliases of searching page.
-     * @return mixed
-     * @see Pages::$alias
+     * @param $page
+     * @param null $route
+     * @param bool $draft
+     * @return string
+     * @throws NotFoundHttpException
      */
-    public function actionIndex($page, $route = null)
+    public function actionIndex($page, $route = null, $draft = false)
     {
 
         // Check probably need redirect to new page URL
@@ -47,9 +50,14 @@ class DefaultController extends Controller
         }
 
         // Separate route from request URL
-        if (is_null($route) && preg_match('/^([\/]+[A-Za-z0-9_\-\_\/]+[\/])*([A-Za-z0-9_\-\_]*)/i', Yii::$app->request->url,$matches)) {
+        if (is_null($route) && preg_match('/^([\/]+[A-Za-z0-9_\-\_\/]+[\/])*([A-Za-z0-9_\-\_]*)/i', Yii::$app->request->url, $matches)) {
             if ($page == $matches[2])
                 $route = rtrim($matches[1], '/');
+        } else {
+            // Normalize route
+            $normalizer = new \yii\web\UrlNormalizer();
+            $route = $normalizer->normalizePathInfo($route, '');
+            $route = '/' . $route;
         }
 
         // If route is root
@@ -57,7 +65,7 @@ class DefaultController extends Controller
             $route = '/';
 
         // Search page model with alias
-        $model = $this->findModel($page);
+        $model = $this->findModel($page, $route, $draft);
 
         // Checking requested route with page route if set
         if (isset($model->route)) {
@@ -77,19 +85,29 @@ class DefaultController extends Controller
     }
 
     /**
-     * Finds the Page model based on alias value.
+     * Finds the Page model based on alias and route values.
      * If the model is not found, a 404 HTTP exception will be thrown.
      *
-     * @param string $alias
-     * @return Page model
-     * @throws NotFoundHttpException if the model not exist or not published
+     * @param $alias
+     * @param null $route
+     * @param bool $draft
+     * @return array|null|Pages|\yii\db\ActiveRecord
+     * @throws NotFoundHttpException
      */
-    protected function findModel($alias)
+    protected function findModel($alias, $route = null, $draft = false)
     {
-        $model = Pages::find()->where([
-            'alias' => $alias,
-            'status' => 1,
-        ])->one();
+        if (!is_null($route)) {
+            $model = Pages::find()->where([
+                'alias' => $alias,
+                'route' => $route,
+                'status' => ($draft) ? 0 : 1,
+            ])->one();
+        } else {
+            $model = Pages::find()->where([
+                'alias' => $alias,
+                'status' => ($draft) ? 0 : 1,
+            ])->one();
+        }
 
         if (!is_null($model))
             return $model;

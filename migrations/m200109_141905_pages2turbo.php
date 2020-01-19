@@ -12,7 +12,7 @@ class m200109_141905_pages2turbo extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn('{{%pages}}', 'in_turbo', $this->boolean()->defaultValue(true));
+        $this->addColumn('{{%pages}}', 'in_turbo', $this->boolean()->defaultValue(true)->after('layout'));
 
     }
 

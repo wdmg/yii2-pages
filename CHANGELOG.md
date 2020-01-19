@@ -1,5 +1,9 @@
 Changelog
 =========
+
+## 1.1.9 (2020-01-19)
+ * Added multiple nesting for pages
+ 
 ## 1.1.8 (2020-01-09)
  * Added support for Yandex.Turbo and Google AMP modules
  

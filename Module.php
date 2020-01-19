@@ -6,7 +6,7 @@ namespace wdmg\pages;
  * Yii2 Pages
  *
  * @category        Module
- * @version         1.1.8
+ * @version         1.1.9
  * @author          Alexsander Vyshnyvetskyy <alex.vyshnyvetskyy@gmail.com>
  * @link            https://github.com/wdmg/yii2-pages
  * @copyright       Copyright (c) 2019 W.D.M.Group, Ukraine
@@ -46,7 +46,7 @@ class Module extends BaseModule
     /**
      * @var string the module version
      */
-    private $version = "1.1.8";
+    private $version = "1.1.9";
 
     /**
      * @var integer, priority of initialization
@@ -127,49 +127,13 @@ class Module extends BaseModule
         parent::bootstrap($app);
 
         // Add routes to pages in frontend
-        $pagesRoute = $this->pagesRoute;
-        if (is_array($pagesRoute)) {
-            foreach ($pagesRoute as $route) {
-                if (empty($route) || $route == "/") {
-                    $app->getUrlManager()->addRules([
-                        [
-                            'pattern' => '/<page:[\w-]+>',
-                            'route' => 'admin/pages/default/index',
-                            'suffix' => ''
-                        ],
-                        '/<page:[\w-]+>/<route:[\w-]+>' => 'admin/pages/default/index',
-                    ], true);
-                } else {
-                    $app->getUrlManager()->addRules([
-                        [
-                            'pattern' => $route . '/<page:[\w-]+>',
-                            'route' => 'admin/pages/default/index',
-                            'suffix' => ''
-                        ],
-                        $route . '/<page:[\w-]+>/<route:[\w-]+>' => 'admin/pages/default/index',
-                    ], true);
-                }
-            }
-        } else {
-            if (empty($pagesRoute) || $pagesRoute == "/") {
-                $app->getUrlManager()->addRules([
-                    [
-                        'pattern' => '/<page:[\w-]+>',
-                        'route' => 'admin/pages/default/index',
-                        'suffix' => ''
-                    ],
-                    '/<page:[\w-]+>/<route:[\w-]+>' => 'admin/pages/default/index',
-                ], true);
-            } else {
-                $app->getUrlManager()->addRules([
-                    [
-                        'pattern' => $pagesRoute . '/<page:[\w-]+>',
-                        'route' => 'admin/pages/default/index',
-                        'suffix' => ''
-                    ],
-                    $pagesRoute . '/<page:[\w-]+>/<route:[\w-]+>' => 'admin/pages/default/index',
-                ], true);
-            }
-        }
+        $app->getUrlManager()->addRules([
+            [
+                'pattern' => '/<route:[\w-\/]+>/<page:[\w-]+>',
+                'route' => 'admin/pages/default',
+                'suffix' => ''
+            ],
+            '/<route:[\w-\/]+>/<page:[\w-]+>' => 'admin/pages/default'
+        ], true);
     }
 }

@@ -37,10 +37,10 @@ class m190725_005152_pages extends Migration
         ], $tableOptions);
 
         $this->createIndex('{{%idx-pages-alias}}', '{{%pages}}', ['name', 'alias']);
-        $this->createIndex('{{%idx-pages-status}}', '{{%pages}}', ['alias', 'status']);
+        $this->createIndex('{{%idx-pages-status}}', '{{%pages}}', ['status']);
 
         // If exist module `Users` set index and foreign key `created_by`, `updated_by` to `users.id`
-        if (class_exists('\wdmg\users\models\Users') && isset(Yii::$app->modules['users'])) {
+        if (class_exists('\wdmg\users\models\Users')) {
             $this->createIndex('{{%idx-pages-author}}','{{%pages}}', ['created_by', 'updated_by'],false);
             $userTable = \wdmg\users\models\Users::tableName();
             $this->addForeignKey(
@@ -64,7 +64,7 @@ class m190725_005152_pages extends Migration
         $this->dropIndex('{{%idx-pages-alias}}', '{{%pages}}');
         $this->dropIndex('{{%idx-pages-status}}', '{{%pages}}');
 
-        if(class_exists('\wdmg\users\models\Users') && isset(Yii::$app->modules['users'])) {
+        if (class_exists('\wdmg\users\models\Users')) {
             $this->dropIndex('{{%idx-pages-author}}', '{{%pages}}');
             $userTable = \wdmg\users\models\Users::tableName();
             if (!(Yii::$app->db->getTableSchema($userTable, true) === null)) {

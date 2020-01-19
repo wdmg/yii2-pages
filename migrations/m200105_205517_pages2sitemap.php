@@ -12,7 +12,7 @@ class m200105_205517_pages2sitemap extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn('{{%pages}}', 'in_sitemap', $this->boolean()->defaultValue(true));
+        $this->addColumn('{{%pages}}', 'in_sitemap', $this->boolean()->defaultValue(true)->after('layout'));
 
     }
 

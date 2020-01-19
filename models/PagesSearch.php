@@ -61,6 +61,10 @@ class PagesSearch extends Pages
             'id' => $this->id,
         ]);
 
+        $query->andFilterWhere([
+            'parent_id' => $this->parent_id,
+        ]);
+
         $query->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'alias', $this->alias])
             ->andFilterWhere(['like', 'title', $this->title])

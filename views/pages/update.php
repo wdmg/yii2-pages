@@ -17,5 +17,6 @@ $this->params['breadcrumbs'][] = Yii::t('app/modules/pages', 'Edit');
     <?= $this->render('_form', [
         'model' => $model,
         'statusModes' => $model->getStatusesList(),
+        'parentsList' => $model->getParentsList(false, true)
     ]) ?>
 </div>

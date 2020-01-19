@@ -12,7 +12,7 @@ class m200109_142012_pages2amp extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn('{{%pages}}', 'in_amp', $this->boolean()->defaultValue(true));
+        $this->addColumn('{{%pages}}', 'in_amp', $this->boolean()->defaultValue(true)->after('layout'));
 
     }
 
