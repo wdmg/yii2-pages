@@ -12,7 +12,9 @@ class m200105_205517_pages2sitemap extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn('{{%pages}}', 'in_sitemap', $this->boolean()->defaultValue(true)->after('layout'));
+
+        if (is_null($this->getDb()->getSchema()->getTableSchema('{{%pages}}')->getColumn('in_sitemap')))
+            $this->addColumn('{{%pages}}', 'in_sitemap', $this->boolean()->defaultValue(true)->after('layout'));
 
     }
 
@@ -21,6 +23,9 @@ class m200105_205517_pages2sitemap extends Migration
      */
     public function safeDown()
     {
-        $this->dropColumn('{{%pages}}', 'in_sitemap');
+
+        if (!is_null($this->getDb()->getSchema()->getTableSchema('{{%pages}}')->getColumn('in_sitemap')))
+            $this->dropColumn('{{%pages}}', 'in_sitemap');
+
     }
 }

@@ -42,7 +42,6 @@ class DefaultController extends Controller
      */
     public function actionIndex($page, $route = null, $draft = false)
     {
-
         $module = $this->module;
 
         // Check probably need redirect to new page URL
@@ -67,7 +66,7 @@ class DefaultController extends Controller
             $route = '/';
 
         // Add default route to path
-        if ($module->pagesRoute)
+        if ($module->pagesRoute && ($route != $module->pagesRoute))
             $route = $module->pagesRoute . $route;
 
         // Search page model with alias

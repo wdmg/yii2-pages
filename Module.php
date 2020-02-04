@@ -147,6 +147,14 @@ class Module extends BaseModule
         } else if (is_string($pagesRoute)) {
             $app->getUrlManager()->addRules([
                 [
+                    'pattern' => $pagesRoute . '/<page:[\w-]+>',
+                    'route' => 'admin/pages/default',
+                    'suffix' => ''
+                ],
+                $pagesRoute . '/<page:[\w-]+>' => 'admin/pages/default'
+            ], true);
+            $app->getUrlManager()->addRules([
+                [
                     'pattern' => $pagesRoute . '/<route:[\w-\/]+>/<page:[\w-]+>',
                     'route' => 'admin/pages/default',
                     'suffix' => ''

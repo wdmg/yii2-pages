@@ -36,8 +36,8 @@ use yii\behaviors\SluggableBehavior;
  */
 class Pages extends ActiveRecord
 {
-    const PAGE_STATUS_DRAFT = 0; // Page has draft
-    const PAGE_STATUS_PUBLISHED = 1; // Page has been published
+    const STATUS_DRAFT = 0; // Page has draft
+    const STATUS_PUBLISHED = 1; // Page has been published
 
     public $url;
 
@@ -189,8 +189,8 @@ class Pages extends ActiveRecord
         }
 
         $list = ArrayHelper::merge($list, [
-            self::PAGE_STATUS_DRAFT => Yii::t('app/modules/pages', 'Draft'),
-            self::PAGE_STATUS_PUBLISHED => Yii::t('app/modules/pages', 'Published'),
+            self::STATUS_DRAFT => Yii::t('app/modules/pages', 'Draft'),
+            self::STATUS_PUBLISHED => Yii::t('app/modules/pages', 'Published'),
         ]);
 
         return $list;
@@ -269,7 +269,7 @@ class Pages extends ActiveRecord
     {
         $this->route = $this->getRoute();
         if (isset($this->alias)) {
-            if ($this->status == self::PAGE_STATUS_DRAFT && $realUrl)
+            if ($this->status == self::STATUS_DRAFT && $realUrl)
                 return \yii\helpers\Url::to(['default/index', 'route' => $this->route, 'page' => $this->alias, 'draft' => 'true'], $withScheme);
             else
                 return \yii\helpers\Url::to($this->route . '/' .$this->alias, $withScheme);
@@ -323,11 +323,11 @@ class Pages extends ActiveRecord
      */
     public function getPublished($cond = null, $asArray = false) {
         if (!is_null($cond) && is_array($cond))
-            $models = self::find()->where(ArrayHelper::merge($cond, ['status' => self::PAGE_STATUS_PUBLISHED]));
+            $models = self::find()->where(ArrayHelper::merge($cond, ['status' => self::STATUS_PUBLISHED]));
         elseif (!is_null($cond) && is_string($cond))
-            $models = self::find()->where(ArrayHelper::merge([$cond], ['status' => self::PAGE_STATUS_PUBLISHED]));
+            $models = self::find()->where(ArrayHelper::merge([$cond], ['status' => self::STATUS_PUBLISHED]));
         else
-            $models = self::find()->where(['status' => self::PAGE_STATUS_PUBLISHED]);
+            $models = self::find()->where(['status' => self::STATUS_PUBLISHED]);
 
         if ($asArray)
             return $models->asArray()->all();

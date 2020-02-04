@@ -12,7 +12,9 @@ class m200109_141905_pages2turbo extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn('{{%pages}}', 'in_turbo', $this->boolean()->defaultValue(true)->after('layout'));
+
+        if (is_null($this->getDb()->getSchema()->getTableSchema('{{%pages}}')->getColumn('in_turbo')))
+            $this->addColumn('{{%pages}}', 'in_turbo', $this->boolean()->defaultValue(true)->after('layout'));
 
     }
 
@@ -21,6 +23,9 @@ class m200109_141905_pages2turbo extends Migration
      */
     public function safeDown()
     {
-        $this->dropColumn('{{%pages}}', 'in_turbo');
+
+        if (!is_null($this->getDb()->getSchema()->getTableSchema('{{%pages}}')->getColumn('in_turbo')))
+            $this->dropColumn('{{%pages}}', 'in_turbo');
+
     }
 }

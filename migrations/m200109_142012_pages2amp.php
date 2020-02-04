@@ -12,7 +12,9 @@ class m200109_142012_pages2amp extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn('{{%pages}}', 'in_amp', $this->boolean()->defaultValue(true)->after('layout'));
+
+        if (is_null($this->getDb()->getSchema()->getTableSchema('{{%pages}}')->getColumn('in_amp')))
+            $this->addColumn('{{%pages}}', 'in_amp', $this->boolean()->defaultValue(true)->after('layout'));
 
     }
 
@@ -21,6 +23,9 @@ class m200109_142012_pages2amp extends Migration
      */
     public function safeDown()
     {
-        $this->dropColumn('{{%pages}}', 'in_amp');
+
+        if (!is_null($this->getDb()->getSchema()->getTableSchema('{{%pages}}')->getColumn('in_amp')))
+            $this->dropColumn('{{%pages}}', 'in_amp');
+
     }
 }
