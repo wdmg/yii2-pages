@@ -38,6 +38,9 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'content',
                 'format' => 'html',
+                'contentOptions' => [
+                    'style' => 'display:inline-block;max-height:360px;overflow-x:auto;'
+                ]
             ],
             'description:ntext',
             'keywords:ntext',
@@ -108,9 +111,58 @@ $this->params['breadcrumbs'][] = $this->title;
                         return null;
                 }
             ],
-            'created_at:datetime',
-            'updated_at:datetime'
+
+            [
+                'attribute' => 'created',
+                'label' => Yii::t('app/modules/pages','Created'),
+                'format' => 'html',
+                'value' => function($data) {
+
+                    $output = "";
+                    if ($user = $data->createdBy) {
+                        $output = Html::a($user->username, ['../admin/users/view/?id='.$user->id], [
+                            'target' => '_blank',
+                            'data-pjax' => 0
+                        ]);
+                    } else if ($data->created_by) {
+                        $output = $data->created_by;
+                    }
+
+                    if (!empty($output))
+                        $output .= ", ";
+
+                    $output .= Yii::$app->formatter->format($data->updated_at, 'datetime');
+                    return $output;
+                }
+            ],
+            [
+                'attribute' => 'updated',
+                'label' => Yii::t('app/modules/pages','Updated'),
+                'format' => 'html',
+                'value' => function($data) {
+
+                    $output = "";
+                    if ($user = $data->updatedBy) {
+                        $output = Html::a($user->username, ['../admin/users/view/?id='.$user->id], [
+                            'target' => '_blank',
+                            'data-pjax' => 0
+                        ]);
+                    } else if ($data->updated_by) {
+                        $output = $data->updated_by;
+                    }
+
+                    if (!empty($output))
+                        $output .= ", ";
+
+                    $output .= Yii::$app->formatter->format($data->updated_at, 'datetime');
+                    return $output;
+                }
+            ],
         ],
     ]); ?>
-
+    <hr/>
+    <div class="form-group">
+        <?= Html::a(Yii::t('app/modules/pages', '&larr; Back to list'), ['pages/index'], ['class' => 'btn btn-default pull-left']) ?>&nbsp;
+        <?= Html::a(Yii::t('app/modules/pages', 'Update'), ['pages/update', 'id' => $model->id], ['class' => 'btn btn-primary pull-right']) ?>
+    </div>
 </div>
