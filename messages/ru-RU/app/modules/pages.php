@@ -57,6 +57,8 @@ return [
 
     'It allowed only Latin alphabet, numbers and the «-», «_», «/» characters.' => "Разрешена только латинница, цифры и «-», «_», «/» символы.",
     'It allowed only Latin alphabet, numbers and the «@», «-», «_», «/» characters.' => "Разрешена только латинница, цифры и «@», «-», «_», «/» символы.",
+    'The value of field `{attribute}` must be a valid JSON, error: {error}.' => "Значение атрибута `{attribute}` должно быть валидным JSON, ошибка: {error}.",
+    'Param attribute must be unique.' => "параметр атрибута должен быть уникальным.",
     'It allowed only Latin alphabet, numbers and the «-», «_» characters.' => "Разрешена только латинница, цифры и «-», «_» символы.",
 
     'Create page' => "Создание страницы",

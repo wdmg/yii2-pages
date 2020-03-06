@@ -51,7 +51,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     if ($data->in_sitemap)
                         return '<span class="fa fa-check text-success"></span>';
                     else
-                        return '<span class="fa fa-remove text-danger"></span>';
+                        return '<span class="fa fa-times text-danger"></span>';
                 }
             ],
             [
@@ -61,7 +61,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     if ($data->in_turbo)
                         return '<span class="fa fa-check text-success"></span>';
                     else
-                        return '<span class="fa fa-remove text-danger"></span>';
+                        return '<span class="fa fa-times text-danger"></span>';
                 }
             ],
             [
@@ -71,7 +71,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     if ($data->in_amp)
                         return '<span class="fa fa-check text-success"></span>';
                     else
-                        return '<span class="fa fa-remove text-danger"></span>';
+                        return '<span class="fa fa-times text-danger"></span>';
                 }
             ],
             [
