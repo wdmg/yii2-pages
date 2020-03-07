@@ -92,7 +92,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
             ],
             [
-                'attribute' => 'in_sitemap',
+                'attribute' => 'common',
+                'label' => Yii::t('app/modules/pages','Common'),
                 'format' => 'html',
                 'headerOptions' => [
                     'class' => 'text-center'
@@ -101,42 +102,27 @@ $this->params['breadcrumbs'][] = $this->title;
                     'class' => 'text-center'
                 ],
                 'value' => function($data) {
+                    $output = '';
                     if ($data->in_sitemap)
-                        return '<span class="fa fa-check text-success"></span>';
+                        $output .= '<span class="fa fa-fw fa-sitemap text-success" title="' . Yii::t('app/modules/pages','Present in sitemap') . '"></span>';
                     else
-                        return '<span class="fa fa-times text-danger"></span>';
-                }
-            ],
-            [
-                'attribute' => 'in_turbo',
-                'format' => 'html',
-                'headerOptions' => [
-                    'class' => 'text-center'
-                ],
-                'contentOptions' => [
-                    'class' => 'text-center'
-                ],
-                'value' => function($data) {
+                        $output .= '<span class="fa fa-fw fa-sitemap text-danger" title="' . Yii::t('app/modules/pages','Not present in sitemap') . '"></span>';
+
+                    $output .= "&nbsp;";
+
                     if ($data->in_turbo)
-                        return '<span class="fa fa-check text-success"></span>';
+                        $output .= '<span class="fa fa-fw fa-rocket text-success" title="' . Yii::t('app/modules/pages','Present in Yandex.Turbo') . '"></span>';
                     else
-                        return '<span class="fa fa-times text-danger"></span>';
-                }
-            ],
-            [
-                'attribute' => 'in_amp',
-                'format' => 'html',
-                'headerOptions' => [
-                    'class' => 'text-center'
-                ],
-                'contentOptions' => [
-                    'class' => 'text-center'
-                ],
-                'value' => function($data) {
+                        $output .= '<span class="fa fa-fw fa-rocket text-danger" title="' . Yii::t('app/modules/pages','Not present in Yandex.Turbo') . '"></span>';
+
+                    $output .= "&nbsp;";
+
                     if ($data->in_amp)
-                        return '<span class="fa fa-check text-success"></span>';
+                        $output .= '<span class="fa fa-fw fa-bolt text-success" title="' . Yii::t('app/modules/pages','Present in Google AMP') . '"></span>';
                     else
-                        return '<span class="fa fa-times text-danger"></span>';
+                        $output .= '<span class="fa fa-fw fa-bolt text-danger" title="' . Yii::t('app/modules/pages','Not present in Google AMP') . '"></span>';
+
+                    return $output;
                 }
             ],
             [

@@ -77,4 +77,11 @@ return [
     'Page has been successfully added!' => "Страница была успешно добавлена!",
     'An error occurred while add the page.' => "Произошла ошибка при добавлении страницы.",
 
+    'Common' => "Дополнительно",
+    'Present in sitemap' => "Присутствует в карте сайта",
+    'Not present in sitemap' => "Не присутствует в карте сайта",
+    'Present in Yandex.Turbo' => "Присутствует в Яндекс.Турбо",
+    'Not present in Yandex.Turbo' => "Не присутствует в Яндекс.Турбо",
+    'Present in Google AMP' => "Присутствует в Google AMP",
+    'Not present in Google AMP' => "Не присутствует в Google AMP",
 ];
