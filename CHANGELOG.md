@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## 1.1.10 (2020-03-11)
+ * Refactoring. Migrations bugfix
+ 
 ## 1.1.9 (2020-01-19)
  * Added multiple nesting for pages
  
