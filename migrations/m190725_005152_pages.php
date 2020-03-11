@@ -44,9 +44,18 @@ class m190725_005152_pages extends Migration
             $this->createIndex('{{%idx-pages-author}}','{{%pages}}', ['created_by', 'updated_by'],false);
             $userTable = \wdmg\users\models\Users::tableName();
             $this->addForeignKey(
-                'fk_pages_to_users',
+                'fk_pages_to_users1',
                 '{{%pages}}',
-                'created_by, updated_by',
+                'created_by',
+                $userTable,
+                'id',
+                'NO ACTION',
+                'CASCADE'
+            );
+            $this->addForeignKey(
+                'fk_pages_to_users2',
+                '{{%pages}}',
+                'updated_by',
                 $userTable,
                 'id',
                 'NO ACTION',
@@ -69,7 +78,11 @@ class m190725_005152_pages extends Migration
             $userTable = \wdmg\users\models\Users::tableName();
             if (!(Yii::$app->db->getTableSchema($userTable, true) === null)) {
                 $this->dropForeignKey(
-                    'fk_pages_to_users',
+                    'fk_pages_to_users1',
+                    '{{%pages}}'
+                );
+                $this->dropForeignKey(
+                    'fk_pages_to_users2',
                     '{{%pages}}'
                 );
             }
