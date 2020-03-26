@@ -84,4 +84,9 @@ return [
     'Not present in Yandex.Turbo' => "Не присутствует в Яндекс.Турбо",
     'Present in Google AMP' => "Присутствует в Google AMP",
     'Not present in Google AMP' => "Не присутствует в Google AMP",
+
+    'First page' => 'Первая страница',
+    'Last page' => 'Последняя страница',
+    '&larr; Prev page' => '&larr; Предыдущая страница',
+    'Next page &rarr;' => 'Следующая страница &rarr;',
 ];
