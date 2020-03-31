@@ -104,18 +104,12 @@ class PagesController extends Controller
 
                 if ($model->save()) {
                     // Log activity
-                    if (
-                        class_exists('\wdmg\activity\models\Activity') &&
-                        $this->module->moduleLoaded('activity') &&
-                        isset(Yii::$app->activity)
-                    ) {
-                        Yii::$app->activity->set(
-                            'New page `' . $model->name . '` with ID `' . $model->id . '` has been successfully added.',
-                            $this->uniqueId . ":" . $this->action->id,
-                            'success',
-                            1
-                        );
-                    }
+                    $this->module->logActivity(
+                        'New page `' . $model->name . '` with ID `' . $model->id . '` has been successfully added.',
+                        $this->uniqueId . ":" . $this->action->id,
+                        'success',
+                        1
+                    );
 
                     Yii::$app->getSession()->setFlash(
                         'success',
@@ -123,18 +117,12 @@ class PagesController extends Controller
                     );
                 } else {
                     // Log activity
-                    if (
-                        class_exists('\wdmg\activity\models\Activity') &&
-                        $this->module->moduleLoaded('activity') &&
-                        isset(Yii::$app->activity)
-                    ) {
-                        Yii::$app->activity->set(
-                            'An error occurred while add the new page: ' . $model->name,
-                            $this->uniqueId . ":" . $this->action->id,
-                            'danger',
-                            1
-                        );
-                    }
+                    $this->module->logActivity(
+                        'An error occurred while add the new page: ' . $model->name,
+                        $this->uniqueId . ":" . $this->action->id,
+                        'danger',
+                        1
+                    );
 
                     Yii::$app->getSession()->setFlash(
                         'danger',
@@ -191,18 +179,12 @@ class PagesController extends Controller
                     }
 
                     // Log activity
-                    if (
-                        class_exists('\wdmg\activity\models\Activity') &&
-                        $this->module->moduleLoaded('activity') &&
-                        isset(Yii::$app->activity)
-                    ) {
-                        Yii::$app->activity->set(
-                            'Page `' . $model->name . '` with ID `' . $model->id . '` has been successfully updated.',
-                            $this->uniqueId . ":" . $this->action->id,
-                            'success',
-                            1
-                        );
-                    }
+                    $this->module->logActivity(
+                        'Page `' . $model->name . '` with ID `' . $model->id . '` has been successfully updated.',
+                        $this->uniqueId . ":" . $this->action->id,
+                        'success',
+                        1
+                    );
 
                     Yii::$app->getSession()->setFlash(
                         'success',
@@ -216,18 +198,12 @@ class PagesController extends Controller
                     );
                 } else {
                     // Log activity
-                    if (
-                        class_exists('\wdmg\activity\models\Activity') &&
-                        $this->module->moduleLoaded('activity') &&
-                        isset(Yii::$app->activity)
-                    ) {
-                        Yii::$app->activity->set(
-                            'An error occurred while update the page `' . $model->name . '` with ID `' . $model->id . '`.',
-                            $this->uniqueId . ":" . $this->action->id,
-                            'danger',
-                            1
-                        );
-                    }
+                    $this->module->logActivity(
+                        'An error occurred while update the page `' . $model->name . '` with ID `' . $model->id . '`.',
+                        $this->uniqueId . ":" . $this->action->id,
+                        'danger',
+                        1
+                    );
 
                     Yii::$app->getSession()->setFlash(
                         'danger',
@@ -281,18 +257,12 @@ class PagesController extends Controller
             // @TODO: remove redirects of deleted pages
 
             // Log activity
-            if (
-                class_exists('\wdmg\activity\models\Activity') &&
-                $this->module->moduleLoaded('activity') &&
-                isset(Yii::$app->activity)
-            ) {
-                Yii::$app->activity->set(
-                    'Page `' . $model->name . '` with ID `' . $model->id . '` has been successfully deleted.',
-                    $this->uniqueId . ":" . $this->action->id,
-                    'success',
-                    1
-                );
-            }
+            $this->module->logActivity(
+                'Page `' . $model->name . '` with ID `' . $model->id . '` has been successfully deleted.',
+                $this->uniqueId . ":" . $this->action->id,
+                'success',
+                1
+            );
 
             Yii::$app->getSession()->setFlash(
                 'success',
@@ -306,18 +276,12 @@ class PagesController extends Controller
             );
         } else {
             // Log activity
-            if (
-                class_exists('\wdmg\activity\models\Activity') &&
-                $this->module->moduleLoaded('activity') &&
-                isset(Yii::$app->activity)
-            ) {
-                Yii::$app->activity->set(
-                    'An error occurred while deleting the page `' . $model->name . '` with ID `' . $model->id . '`.',
-                    $this->uniqueId . ":" . $this->action->id,
-                    'danger',
-                    1
-                );
-            }
+            $this->module->logActivity(
+                'An error occurred while deleting the page `' . $model->name . '` with ID `' . $model->id . '`.',
+                $this->uniqueId . ":" . $this->action->id,
+                'danger',
+                1
+            );
 
             Yii::$app->getSession()->setFlash(
                 'danger',
