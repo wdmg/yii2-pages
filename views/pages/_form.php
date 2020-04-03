@@ -49,6 +49,15 @@ use wdmg\widgets\SelectInput;
     <?= $form->field($model, 'status')->widget(SelectInput::class, [
         'items' => $statusModes,
         'options' => [
+            'id' => 'page-form-status',
+            'class' => 'form-control'
+        ]
+    ]); ?>
+
+    <?= $form->field($model, 'locale')->widget(SelectInput::class, [
+        'items' => $languagesList,
+        'options' => [
+            'id' => 'page-form-locale',
             'class' => 'form-control'
         ]
     ]); ?>
@@ -56,6 +65,7 @@ use wdmg\widgets\SelectInput;
     <?= $form->field($model, 'parent_id')->widget(SelectInput::class, [
         'items' => $parentsList,
         'options' => [
+            'id' => 'page-form-parent',
             'class' => 'form-control'
         ]
     ]); ?>

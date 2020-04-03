@@ -17,6 +17,7 @@ use yii\behaviors\SluggableBehavior;
  *
  * @property int $id
  * @property int $parent_id
+ * @property int $source_id
  * @property string $name
  * @property string $alias
  * @property string $content
@@ -26,6 +27,7 @@ use yii\behaviors\SluggableBehavior;
  * @property boolean $in_sitemap
  * @property boolean $in_turbo
  * @property boolean $in_amp
+ * @property string $locale
  * @property boolean $status
  * @property string $route
  * @property string $layout
@@ -90,15 +92,19 @@ class Pages extends ActiveRecord
     public function rules()
     {
         $rules = [
-            ['parent_id', 'integer'],
-            [['name', 'alias', 'content'], 'required'],
+            [['name', 'alias', 'content', 'locale'], 'required'],
             [['name', 'alias'], 'string', 'min' => 3, 'max' => 128],
             [['name', 'alias'], 'string', 'min' => 3, 'max' => 128],
             [['title', 'description', 'keywords'], 'string', 'max' => 255],
             [['status', 'in_sitemap', 'in_turbo', 'in_amp'], 'boolean'],
 
+            [['parent_id', 'source_id'], 'integer'],
+
             ['route', 'string', 'max' => 32],
             ['route', 'match', 'pattern' => '/^[A-Za-z0-9\-\_\/]+$/', 'message' => Yii::t('app/modules/pages','It allowed only Latin alphabet, numbers and the «-», «_», «/» characters.')],
+
+            ['locale', 'string', 'max' => 10],
+            ['locale', 'checkLocale'],
 
             ['layout', 'string', 'max' => 64],
             ['layout', 'match', 'pattern' => '/^[A-Za-z0-9\-\_\/\@]+$/', 'message' => Yii::t('app/modules/pages','It allowed only Latin alphabet, numbers and the «@», «-», «_», «/» characters.')],
@@ -114,6 +120,27 @@ class Pages extends ActiveRecord
 
         return $rules;
     }
+
+    public function checkLocale($attribute, $params)
+    {
+        $hasError = false;
+        if (!empty($this->locale) && !empty($this->source_id)) {
+
+            if (self::find()->where(['locale' => $this->locale, 'source_id' => $this->source_id])->andWhere(['not', 'id' => $this->id])->count())
+                $hasError = true;
+
+            if (self::find()->where(['locale' => $this->locale, 'id' => $this->source_id])->count())
+                $hasError = true;
+
+        }
+
+        if ($hasError) {
+            $this->addError($attribute, Yii::t('app/modules/pages', 'Page with this locale already exist.'));
+        }
+
+        return $hasError;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -122,6 +149,7 @@ class Pages extends ActiveRecord
         return [
             'id' => Yii::t('app/modules/pages', 'ID'),
             'parent_id' => Yii::t('app/modules/pages', 'Parent ID'),
+            'source_id' => Yii::t('app/modules/pages', 'Source ID'),
             'name' => Yii::t('app/modules/pages', 'Name'),
             'alias' => Yii::t('app/modules/pages', 'Alias'),
             'content' => Yii::t('app/modules/pages', 'Content'),
@@ -131,6 +159,7 @@ class Pages extends ActiveRecord
             'in_sitemap' => Yii::t('app/modules/pages', 'In sitemap?'),
             'in_turbo' => Yii::t('app/modules/pages', 'Yandex turbo-pages?'),
             'in_amp' => Yii::t('app/modules/pages', 'Google AMP?'),
+            'locale' => Yii::t('app/modules/pages', 'Locale'),
             'status' => Yii::t('app/modules/pages', 'Status'),
             'route' => Yii::t('app/modules/pages', 'Route'),
             'layout' => Yii::t('app/modules/pages', 'Layout'),
@@ -367,5 +396,83 @@ class Pages extends ActiveRecord
             $this->url = $this->getPageUrl();
 
         return $this->url;
+    }
+
+
+    /**
+     * @param null $source_id
+     * @param bool $asArray
+     * @return array|\yii\db\ActiveQuery|ActiveRecord[]|null
+     */
+    public function getAllVersions($source_id = null, $asArray = false)
+    {
+        if (is_null($source_id))
+            return null;
+
+        $models = self::find()->andWhere(['id' => $source_id])->orWhere(['source_id' => $source_id]);
+
+        if ($asArray)
+            return $models->asArray()->all();
+        else
+            return $models;
+    }
+
+    /**
+     *
+     * @return array
+     */
+    public function getLanguages($id = null, $asArray = false)
+    {
+
+        if (!($models = $this->getAllVersions($id, false))) {
+            $models = self::find();
+        }
+
+        $models->select('locale')->groupBy('locale');
+
+        if ($asArray)
+            $models->asArray();
+
+        $languages = [];
+        $locales = ArrayHelper::getColumn($models->all(), 'locale');
+        foreach ($locales as $locale) {
+            if (!is_null($locale)) {
+                if (extension_loaded('intl')) {
+                    $languages[] = [
+                        $locale => mb_convert_case(trim(\Locale::getDisplayLanguage($locale, Yii::$app->language)), MB_CASE_TITLE, "UTF-8"),
+                    ];
+                } else {
+                    $languages[] = [
+                        $locale => $locale,
+                    ];
+                }
+            }
+        }
+        return $languages;
+    }
+
+    /**
+     * @param bool $allLanguages
+     * @param bool $onlyUsed
+     * @return array
+     */
+    public function getLanguagesList($allLanguages = false)
+    {
+        $list = [];
+        if ($allLanguages) {
+            $list = [
+                '*' => Yii::t('app/modules/pages', 'All languages')
+            ];
+        }
+
+        $languages = $this->getLanguages(null, false);
+        if (isset(Yii::$app->translations)) {
+            $locales = Yii::$app->translations->getLocales(false, false, true);
+            $languages = array_diff_assoc(ArrayHelper::map($locales, 'locale', 'name'), $languages);
+        }
+
+        $list = ArrayHelper::merge($list, $languages);
+
+        return $list;
     }
 }

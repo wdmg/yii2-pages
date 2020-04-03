@@ -89,4 +89,20 @@ return [
     'Last page' => 'Последняя страница',
     '&larr; Prev page' => '&larr; Предыдущая страница',
     'Next page &rarr;' => 'Следующая страница &rarr;',
+
+    'Locale' => 'Языковая локаль',
+    'Source ID' => 'ИД исходника',
+    'Language' => 'Язык',
+    'Languages' => 'Языки',
+    'All languages' => 'Все языки',
+    'Not selected' => 'Не выбран',
+    'Page with this locale already exist.' => 'Страница с этим языком уже существует.',
+    'No display language has been set for this page. When saving, the current user language will be selected: {language}' => 'Для данной страницы не задан язык отображения. При сохранении будет выбран текущий язык пользователя: {language}',
+    'View' => "Просмотр",
+    'Update' => "Изменить",
+    'Delete' => "Удалить",
+    'Language version: {language}' => "Языковая версия: {language}",
+    'Are you sure you want to delete this page?' => "Вы уверены, что хотите удалить эту страницу?",
+    'Are you sure you want to delete the language version of this page?' => "Вы уверены, что хотите удалить языковую версию этой страницы?",
+
 ];

@@ -1,5 +1,6 @@
 <?php
 
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\DetailView;
@@ -10,6 +11,12 @@ use yii\widgets\DetailView;
 $this->title = Yii::t('app/modules/pages', 'View page');
 $this->params['breadcrumbs'][] = ['label' => $this->context->module->name, 'url' => ['pages/index']];
 $this->params['breadcrumbs'][] = $this->title;
+
+$bundle = false;
+if ($model->locale && isset(Yii::$app->translations) && class_exists('\wdmg\translations\FlagsAsset')) {
+    $bundle = \wdmg\translations\FlagsAsset::register(Yii::$app->view);
+}
+
 ?>
 <div class="page-header">
     <h1><?= Html::encode($this->title) ?> <small class="text-muted pull-right">[v.<?= $this->context->module->version ?>]</small></h1>
@@ -70,6 +77,35 @@ $this->params['breadcrumbs'][] = $this->title;
                         $output .= '<span class="fa fa-fw fa-bolt text-danger" title="' . Yii::t('app/modules/pages','Not present in Google AMP') . '"></span>';
 
                     return $output;
+                }
+            ],
+            [
+                'attribute' => 'locale',
+                'label' => Yii::t('app/modules/pages','Language'),
+                'format' => 'raw',
+                'value' => function($data) use ($bundle) {
+                    if ($data->locale) {
+                        if ($bundle) {
+                            $locale = Yii::$app->translations->parseLocale($data->locale, Yii::$app->language);
+                            if ($data->locale === $locale['locale']) { // Fixing default locale from PECL intl
+                                if (!($country = $locale['domain']))
+                                    $country = '_unknown';
+
+                                $flag = \yii\helpers\Html::img($bundle->baseUrl . '/flags-iso/flat/24/' . $country . '.png', [
+                                    'title' => $locale['name']
+                                ]);
+                                return $flag . " " . $locale['name'];
+                            }
+                        } else {
+                            if (extension_loaded('intl'))
+                                $language = mb_convert_case(trim(\Locale::getDisplayLanguage($data->locale, Yii::$app->language)), MB_CASE_TITLE, "UTF-8");
+                            else
+                                $language = $data->locale;
+
+                            return $language;
+                        }
+                    }
+                    return null;
                 }
             ],
             [
