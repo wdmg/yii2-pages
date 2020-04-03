@@ -26,7 +26,6 @@ return [
     'View page' => "Просмотр страницы",
     'All pages' => "Все страницы",
     'Updating page: {name}' => "Редактирование страницы: {name}",
-    'Edit' => "Редактирование",
     'Update' => "Редактировать",
     'Actions' => "Действия",
     'Params' => "Параметры",
@@ -74,6 +73,9 @@ return [
 
     'The requested page does not exist.' => "Запрошенная страница не существует.",
 
+    'The current page should not link to itself.' => 'Текущая страница не должна ссылаться на саму себя.',
+    'Child page cannot link to the language version of the page.' => 'Дочерняя страница не может ссылаться на языковую версию страницы.',
+
     'Page has been successfully added!' => "Страница была успешно добавлена!",
     'An error occurred while add the page.' => "Произошла ошибка при добавлении страницы.",
 
@@ -96,12 +98,23 @@ return [
     'Languages' => 'Языки',
     'All languages' => 'Все языки',
     'Not selected' => 'Не выбран',
-    'Page with this locale already exist.' => 'Страница с этим языком уже существует.',
+    'It looks like the same language version of page or child page already exists.' => 'Похоже, что такая же языковая версия или дочерняя страница уже существует.',
+    'The language version must refer to the main version.' => 'Языковая версия должна ссылаться на основную версию.',
+    'A language version with the selected language already exists.' => 'Языковая версия с выбранным языком уже существует.',
     'No display language has been set for this page. When saving, the current user language will be selected: {language}' => 'Для данной страницы не задан язык отображения. При сохранении будет выбран текущий язык пользователя: {language}',
     'View' => "Просмотр",
-    'Update' => "Изменить",
+    'Edit' => "Изменить",
     'Delete' => "Удалить",
+    'Source version: {language}' => "Исходная версия: {language}",
+    'Edit source version: {language}' => "Изменить исходную версию: {language}",
+    'Add source version: {language}' => "Добавить исходную версию: {language}",
+    'View source version: {language}' => "Смотреть исходную версию: {language}",
+    'Delete source version: {language}' => "Удалить исходную версию: {language}",
     'Language version: {language}' => "Языковая версия: {language}",
+    'Edit language version: {language}' => "Изменить языковую версию: {language}",
+    'Add language version: {language}' => "Добавить языковую версию: {language}",
+    'View language version: {language}' => "Смотреть языковую версию: {language}",
+    'Delete language version: {language}' => "Удалить языковую версию: {language}",
     'Are you sure you want to delete this page?' => "Вы уверены, что хотите удалить эту страницу?",
     'Are you sure you want to delete the language version of this page?' => "Вы уверены, что хотите удалить языковую версию этой страницы?",
 

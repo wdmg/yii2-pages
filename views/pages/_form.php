@@ -66,7 +66,8 @@ use wdmg\widgets\SelectInput;
         'items' => $parentsList,
         'options' => [
             'id' => 'page-form-parent',
-            'class' => 'form-control'
+            'class' => 'form-control',
+            'disabled' => (!is_null($model->source_id)) ? true : false
         ]
     ]); ?>
 

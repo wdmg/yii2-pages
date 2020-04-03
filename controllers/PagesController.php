@@ -97,6 +97,7 @@ class PagesController extends Controller
     public function actionCreate()
     {
         $model = new Pages();
+        $model->scenario = $model::PAGE_SCENARIO_CREATE;
         $model->status = $model::PAGE_STATUS_DRAFT;
         $model->route = null;
         $model->layout = null;

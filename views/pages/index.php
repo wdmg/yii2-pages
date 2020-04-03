@@ -37,7 +37,14 @@ if (isset(Yii::$app->translations) && class_exists('\wdmg\translations\FlagsAsse
                 'attribute' => 'name',
                 'format' => 'raw',
                 'value' => function($model) {
-                    $output = Html::tag('strong', $model->name);
+
+                    if ($model->parent_id) {
+                        $output = Html::tag('span', "↳", ['class' => "text-muted"]) .
+                            "&nbsp;" . Html::tag('em', Html::tag('strong', $model->name));
+                    } else {
+                        $output = Html::tag('strong', $model->name);
+                    }
+
                     if (($pageURL = $model->getPageUrl()) && $model->id)
                         $output .= '<br/>' . Html::a($pageURL, $pageURL, [
                             'target' => '_blank',
@@ -162,13 +169,30 @@ if (isset(Yii::$app->translations) && class_exists('\wdmg\translations\FlagsAsse
                                     $country = '_unknown';
 
                                 $flag = \yii\helpers\Html::img($bundle->baseUrl . '/flags-iso/flat/24/' . $country . '.png', [
-                                    'title' => $locale['name']
+                                    'alt' => $locale['name']
                                 ]);
 
                                 if ($data->locale === $locale['locale']) // It`s source version
-                                    $output[] = Html::a($flag, ['pages/update', 'id' => $data->id]);
+                                    $output[] = Html::a($flag,
+                                        [
+                                            'pages/update', 'id' => $data->id
+                                        ], [
+                                            'title' => Yii::t('app/modules/pages','Edit source version: {language}', [
+                                                'language' => $locale['name']
+                                            ])
+                                        ]
+                                    );
                                 else  // Other localization versions
-                                    $output[] = Html::a($flag, ['pages/update', 'id' => $data->id, 'locale' => $locale['locale']]);
+                                    $output[] = Html::a($flag,
+                                        [
+                                            'pages/update', 'id' => $data->id,
+                                            'locale' => $locale['locale']
+                                        ], [
+                                            'title' => Yii::t('app/modules/pages','Edit language version: {language}', [
+                                                'language' => $locale['name']
+                                            ])
+                                        ]
+                                    );
 
                             }
 
@@ -184,10 +208,26 @@ if (isset(Yii::$app->translations) && class_exists('\wdmg\translations\FlagsAsse
                                     $language = $locale;
 
                                 if ($data->locale === $locale) // It`s source version
-                                    $output[] = Html::a($language, ['pages/update', 'id' => $data->id]);
+                                    $output[] = Html::a($language,
+                                        [
+                                            'pages/update', 'id' => $data->id
+                                        ], [
+                                            'title' => Yii::t('app/modules/pages','Edit source version: {language}', [
+                                                'language' => $language
+                                            ])
+                                        ]
+                                    );
                                 else  // Other localization versions
-                                    $output[] = Html::a($language, ['pages/update', 'id' => $data->id, 'locale' => $locale]);
-
+                                    $output[] = Html::a($language,
+                                        [
+                                            'pages/update', 'id' => $data->id,
+                                            'locale' => $locale
+                                        ], [
+                                            'title' => Yii::t('app/modules/pages','Edit language version: {language}', [
+                                                'language' => $language
+                                            ])
+                                        ]
+                                    );
                             }
                         }
                     }
@@ -258,11 +298,11 @@ if (isset(Yii::$app->translations) && class_exists('\wdmg\translations\FlagsAsse
                                 if ($item_locale === $locale['locale']) { // Fixing default locale from PECL intl
 
                                     if ($data->locale === $locale['locale']) // It`s source version
-                                        $output[] = Html::a(Yii::t('app/modules/pages','Language version: {language}', [
+                                        $output[] = Html::a(Yii::t('app/modules/pages','View source version: {language}', [
                                             'language' => $locale['name']
                                         ]), ['pages/view', 'id' => $data->id]);
                                     else  // Other localization versions
-                                        $output[] = Html::a(Yii::t('app/modules/pages','Language version: {language}', [
+                                        $output[] = Html::a(Yii::t('app/modules/pages','View language version: {language}', [
                                             'language' => $locale['name']
                                         ]), ['pages/view', 'id' => $data->id, 'locale' => $locale['locale']]);
 
@@ -278,11 +318,11 @@ if (isset(Yii::$app->translations) && class_exists('\wdmg\translations\FlagsAsse
                                         $language = $locale;
 
                                     if ($data->locale === $locale) // It`s source version
-                                        $output[] = Html::a(Yii::t('app/modules/pages','Language version: {language}', [
+                                        $output[] = Html::a(Yii::t('app/modules/pages','View source version: {language}', [
                                             'language' => $language
                                         ]), ['pages/view', 'id' => $data->id]);
                                     else  // Other localization versions
-                                        $output[] = Html::a(Yii::t('app/modules/pages','Language version: {language}', [
+                                        $output[] = Html::a(Yii::t('app/modules/pages','View language version: {language}', [
                                             'language' => $language
                                         ]), ['pages/view', 'id' => $data->id, 'locale' => $locale]);
 
@@ -332,11 +372,11 @@ if (isset(Yii::$app->translations) && class_exists('\wdmg\translations\FlagsAsse
                                 if ($item_locale === $locale['locale']) { // Fixing default locale from PECL intl
 
                                     if ($data->locale === $locale['locale']) // It`s source version
-                                        $output[] = Html::a(Yii::t('app/modules/pages','Language version: {language}', [
+                                        $output[] = Html::a(Yii::t('app/modules/pages','Edit source version: {language}', [
                                             'language' => $locale['name']
                                         ]), ['pages/update', 'id' => $data->id]);
                                     else  // Other localization versions
-                                        $output[] = Html::a(Yii::t('app/modules/pages','Language version: {language}', [
+                                        $output[] = Html::a(Yii::t('app/modules/pages','Edit language version: {language}', [
                                             'language' => $locale['name']
                                         ]), ['pages/update', 'id' => $data->id, 'locale' => $locale['locale']]);
 
@@ -352,11 +392,11 @@ if (isset(Yii::$app->translations) && class_exists('\wdmg\translations\FlagsAsse
                                         $language = $locale;
 
                                     if ($data->locale === $locale) // It`s source version
-                                        $output[] = Html::a(Yii::t('app/modules/pages','Language version: {language}', [
+                                        $output[] = Html::a(Yii::t('app/modules/pages','Edit source version: {language}', [
                                             'language' => $language
                                         ]), ['pages/update', 'id' => $data->id]);
                                     else  // Other localization versions
-                                        $output[] = Html::a(Yii::t('app/modules/pages','Language version: {language}', [
+                                        $output[] = Html::a(Yii::t('app/modules/pages','Edit language version: {language}', [
                                             'language' => $language
                                         ]), ['pages/update', 'id' => $data->id, 'locale' => $locale]);
 
@@ -370,7 +410,7 @@ if (isset(Yii::$app->translations) && class_exists('\wdmg\translations\FlagsAsse
                                 $html .= '<div class="btn-group">';
                                 $html .= Html::a(
                                     '<span class="glyphicon glyphicon-pencil"></span> ' .
-                                    Yii::t('app/modules/pages', 'Update') .
+                                    Yii::t('app/modules/pages', 'Edit') .
                                     ' <span class="caret"></span>',
                                     '#',
                                     [
@@ -406,14 +446,14 @@ if (isset(Yii::$app->translations) && class_exists('\wdmg\translations\FlagsAsse
                                 if ($item_locale === $locale['locale']) { // Fixing default locale from PECL intl
 
                                     if ($data->locale === $locale['locale']) // It`s source version
-                                        $output[] = Html::a(Yii::t('app/modules/pages','Language version: {language}', [
+                                        $output[] = Html::a(Yii::t('app/modules/pages','Delete source version: {language}', [
                                             'language' => $locale['name']
                                         ]), ['pages/delete', 'id' => $data->id], [
                                             'data-method' => 'POST',
                                             'data-confirm' => Yii::t('app/modules/pages', 'Are you sure you want to delete the language version of this page?')
                                         ]);
                                     else  // Other localization versions
-                                        $output[] = Html::a(Yii::t('app/modules/pages','Language version: {language}', [
+                                        $output[] = Html::a(Yii::t('app/modules/pages','Delete language version: {language}', [
                                             'language' => $locale['name']
                                         ]), ['pages/delete', 'id' => $data->id, 'locale' => $locale['locale']], [
                                             'data-method' => 'POST',
@@ -432,14 +472,14 @@ if (isset(Yii::$app->translations) && class_exists('\wdmg\translations\FlagsAsse
                                         $language = $locale;
 
                                     if ($data->locale === $locale) // It`s source version
-                                        $output[] = Html::a(Yii::t('app/modules/pages','Language version: {language}', [
+                                        $output[] = Html::a(Yii::t('app/modules/pages','Delete source version: {language}', [
                                             'language' => $language
                                         ]), ['pages/delete', 'id' => $data->id], [
                                             'data-method' => 'POST',
                                             'data-confirm' => Yii::t('app/modules/pages', 'Are you sure you want to delete the language version of this page?')
                                         ]);
                                     else  // Other localization versions
-                                        $output[] = Html::a(Yii::t('app/modules/pages','Language version: {language}', [
+                                        $output[] = Html::a(Yii::t('app/modules/pages','Delete language version: {language}', [
                                             'language' => $language
                                         ]), ['pages/delete', 'id' => $data->id, 'locale' => $locale], [
                                             'data-method' => 'POST',

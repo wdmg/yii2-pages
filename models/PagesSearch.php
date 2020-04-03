@@ -96,6 +96,8 @@ class PagesSearch extends Pages
         if ($this->status !== "*")
             $query->andFilterWhere(['like', 'status', $this->status]);
 
+        $query->orderBy('COALESCE(`parent_id`, `id`), `parent_id` IS NOT NULL, `id`');
+
         return $dataProvider;
     }
 

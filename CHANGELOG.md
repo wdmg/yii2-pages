@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## 1.2.*
+ * Added rules and checker for Pages model
+ * Multi-language implementation
+ 
 ## 1.1.12 (2020-03-31)
  * Refactoring log of activity
  * Log activity

@@ -40,6 +40,7 @@ class Pages extends ActiveRecord
 {
     const PAGE_STATUS_DRAFT = 0; // Page has draft
     const PAGE_STATUS_PUBLISHED = 1; // Page has been published
+    const PAGE_SCENARIO_CREATE = 'create';
 
     public $url;
 
@@ -99,6 +100,8 @@ class Pages extends ActiveRecord
             [['status', 'in_sitemap', 'in_turbo', 'in_amp'], 'boolean'],
 
             [['parent_id', 'source_id'], 'integer'],
+            ['parent_id', 'checkParent'],
+            ['source_id', 'checkSource'],
 
             ['route', 'string', 'max' => 32],
             ['route', 'match', 'pattern' => '/^[A-Za-z0-9\-\_\/]+$/', 'message' => Yii::t('app/modules/pages','It allowed only Latin alphabet, numbers and the «-», «_», «/» characters.')],
@@ -106,10 +109,13 @@ class Pages extends ActiveRecord
             ['locale', 'string', 'max' => 10],
             ['locale', 'checkLocale'],
 
+            [['parent_id', 'source_id'], 'doublesCheck', 'on' => self::PAGE_SCENARIO_CREATE],
+
             ['layout', 'string', 'max' => 64],
             ['layout', 'match', 'pattern' => '/^[A-Za-z0-9\-\_\/\@]+$/', 'message' => Yii::t('app/modules/pages','It allowed only Latin alphabet, numbers and the «@», «-», «_», «/» characters.')],
 
-            ['alias', 'unique', 'message' => Yii::t('app/modules/pages', 'Param attribute must be unique.')],
+            //['alias', 'unique', 'message' => Yii::t('app/modules/pages', 'Param attribute must be unique.')],
+            ['alias', 'checkAlias'],
             ['alias', 'match', 'pattern' => '/^[A-Za-z0-9\-\_]+$/', 'message' => Yii::t('app/modules/pages','It allowed only Latin alphabet, numbers and the «-», «_» characters.')],
             [['created_at', 'updated_at'], 'safe'],
         ];
@@ -121,12 +127,131 @@ class Pages extends ActiveRecord
         return $rules;
     }
 
+    /**
+     * Checks if there is a page (language version) with the same parent, source version and language locale.
+     * Used according by the scenario when creating a new page.
+     *
+     * @param $attribute
+     * @param $params
+     * @return bool
+     */
+    public function doublesCheck($attribute, $params)
+    {
+        $hasError = false;
+        if (!empty($this->parent_id) && !empty($this->source_id) && !empty($this->locale)) {
+
+            if (self::find()->where(['parent_id' => $this->parent_id, 'source_id' => $this->source_id, 'locale' => $this->locale])->count())
+                $hasError = true;
+
+        }
+
+        if ($hasError) {
+            $this->addError($attribute, Yii::t('app/modules/pages', 'It looks like the same language version of page or child page already exists.'));
+        }
+
+        return $hasError;
+    }
+
+    /**
+     * Checks if the current page (language version) links to a page that is not the main version.
+     *
+     * @param $attribute
+     * @param $params
+     * @return bool
+     */
+    public function checkParent($attribute, $params)
+    {
+        $hasError = false;
+        if (!empty($this->parent_id) && !empty($this->source_id)) {
+
+            if (self::find()->where(['id' => $this->parent_id])->andWhere(['!=', 'source_id', null])->count())
+                $hasError = true;
+
+        }
+
+        if ($hasError) {
+            $this->addError($attribute, Yii::t('app/modules/pages', 'Child page cannot link to the language version of the page.'));
+        }
+
+        return $hasError;
+    }
+
+    /**
+     * Checks if the alias of the current page is not an alias duplicate of the main version.
+     *
+     * @param $attribute
+     * @param $params
+     * @return bool
+     */
+    public function checkAlias($attribute, $params)
+    {
+        $hasError = false;
+        if (!empty($this->alias) && !empty($this->source_id)) {
+
+            if (self::find()->where(['alias' => $this->alias])->andWhere(['!=', 'source_id', $this->source_id])->count())
+                $hasError = true;
+
+            if (self::find()->where(['alias' => $this->alias, 'source_id' => null])->andWhere(['!=', 'id', $this->id])->count())
+                $hasError = true;
+
+        }
+
+        if ($hasError) {
+            $this->addError($attribute, Yii::t('app/modules/pages', 'Param attribute must be unique.'));
+        }
+
+        return $hasError;
+    }
+
+    /**
+     * Checks if the current language version of the page is referencing itself
+     *
+     * @param $attribute
+     * @param $params
+     * @return bool
+     */
+    public function checkSource($attribute, $params)
+    {
+        $hasError = false;
+        if (!empty($this->source_id)) {
+
+            if ($this->id == $this->source_id)
+                $hasError = true;
+
+        }
+
+        if ($hasError) {
+            $this->addError($attribute, Yii::t('app/modules/pages', 'The language version must refer to the main version.'));
+        }
+
+        $hasError = false;
+        if (!empty($this->parent_id)) {
+
+            if ($this->id == $this->parent_id)
+                $hasError = true;
+
+        }
+
+        if ($hasError) {
+            $this->addError($attribute, Yii::t('app/modules/pages', 'The current page should not link to itself.'));
+        }
+
+        return $hasError;
+    }
+
+    /**
+     * Checks if the same language version of the current page exists.
+     *
+     * @param $attribute
+     * @param $params
+     * @return bool
+     */
     public function checkLocale($attribute, $params)
     {
         $hasError = false;
         if (!empty($this->locale) && !empty($this->source_id)) {
 
-            if (self::find()->where(['locale' => $this->locale, 'source_id' => $this->source_id])->andWhere(['not', 'id' => $this->id])->count())
+            if (self::find()->where(['locale' => $this->locale, 'source_id' => $this->source_id])->andWhere(['!=', 'id', $this->id])->count())
                 $hasError = true;
 
             if (self::find()->where(['locale' => $this->locale, 'id' => $this->source_id])->count())
@@ -135,7 +260,7 @@ class Pages extends ActiveRecord
         }
 
         if ($hasError) {
-            $this->addError($attribute, Yii::t('app/modules/pages', 'Page with this locale already exist.'));
+            $this->addError($attribute, Yii::t('app/modules/pages', 'A language version with the selected language already exists.'));
         }
 
         return $hasError;
@@ -168,6 +293,25 @@ class Pages extends ActiveRecord
             'updated_at' => Yii::t('app/modules/pages', 'Updated at'),
             'updated_by' => Yii::t('app/modules/pages', 'Updated by'),
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function beforeValidate()
+    {
+        /**
+         * If the parent of the page was specified but the language version is retained, you must obtain one
+         * `id` of the main version of the page and link to it the current page
+         */
+        if (is_null($this->source_id) && !is_null($this->parent_id)) {
+            $source = self::findOne(['parent_id' => $this->parent_id, 'source_id' => null]);
+            if (!is_null($source->id)) {
+                $this->source_id = $source->id;
+            }
+        }
+
+        return parent::beforeValidate();
     }
 
     /**
