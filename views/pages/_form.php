@@ -1,5 +1,8 @@
 <?php
 
+use yii\bootstrap\Button;
+use yii\bootstrap\ButtonGroup;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
@@ -12,6 +15,116 @@ use wdmg\widgets\SelectInput;
 ?>
 
 <div class="pages-form">
+
+    <?php
+        $buttons = [];
+
+        if ($model->source_id)
+            $versions = $model->getAllVersions($model->source_id, true);
+        else
+            $versions = $model->getAllVersions($model->id, true);
+
+        if ($versions) {
+            $existing = ArrayHelper::map($versions, 'id', 'locale');
+        } else {
+            $existing = [];
+        }
+
+        $locales = Yii::$app->translations->getLocales(false, false, true);
+        $locales = ArrayHelper::map($locales, 'id', 'locale');
+        $locales = array_unique(ArrayHelper::merge($existing, $locales));
+
+        if (isset(Yii::$app->translations)) {
+            $bundle = \wdmg\translations\FlagsAsset::register(Yii::$app->view);
+            foreach ($locales as $item_locale) {
+
+                $locale = Yii::$app->translations->parseLocale($item_locale, Yii::$app->language);
+
+                if ($item_locale === $locale['locale']) { // Fixing default locale from PECL intl
+
+                    if (!($country = $locale['domain']))
+                        $country = '_unknown';
+
+                    $flag = \yii\helpers\Html::img($bundle->baseUrl . '/flags-iso/flat/24/' . $country . '.png', [
+                        'alt' => $locale['name']
+                    ]);
+
+                    if (in_array($locale['locale'], $existing, true)) {
+
+                        if ($model->locale === $locale['locale']) {
+                            $url = Url::to(['pages/update', 'id' => $model->id]);
+                        } elseif ($model->source_id) {
+                            $url = Url::to(['pages/update', 'id' => $model->source_id]);
+                        } else {
+                            $url = Url::to(['pages/update', 'id' => $model->id, 'locale' => $locale['locale']]);
+                        }
+
+                    } else {
+                        $url = Url::to(['pages/create', 'source_id' => $model->id, 'locale' => $locale['locale']]);
+                    }
+
+                    $buttons[] = Button::widget([
+                        'label' => $flag . '&nbsp;' . $locale['name'],
+                        'tagName' => 'a',
+                        'encodeLabel' => false,
+                        'options' => [
+                            'class' => 'btn btn-sm ' . (($model->locale == $locale['locale']) ? 'btn-primary' : 'btn-default'),
+                            'href' => $url,
+                            'title' => Yii::t('app/modules/pages', 'Edit language version: {language}', [
+                                'language' => $locale['name']
+                            ]),
+                            'data-pjax' => 0
+                        ]
+                    ]);
+                }
+
+            }
+        } else {
+            foreach ($locales as $locale) {
+                if (!empty($locale)) {
+
+                    if (extension_loaded('intl'))
+                        $language = mb_convert_case(trim(\Locale::getDisplayLanguage($locale, Yii::$app->language)), MB_CASE_TITLE, "UTF-8");
+                    else
+                        $language = $locale;
+
+                    if (array_search($locale, $existing, true)) {
+                        $url = Url::to(
+                            ($model->locale === $locale) ?
+                                ['pages/update', 'id' => $model->id] :
+                                ['pages/update', 'id' => $model->id, 'locale' => $locale]
+                        );
+                    } else {
+                        $url = Url::to(['pages/create', 'source_id' => $model->id, 'locale' => $locale]);
+                    }
+
+                    $buttons[] = Button::widget([
+                        'label' => $language,
+                        'tagName' => 'a',
+                        'encodeLabel' => false,
+                        'options' => [
+                            'class' => 'btn btn-sm ' . (($model->locale === $locale) ? 'btn-primary' : 'btn-default'),
+                            'href' => $url,
+                            'title' => Yii::t('app/modules/pages', 'Edit language version: {language}', [
+                                'language' => $language
+                            ]),
+                            'data-pjax' => 0
+                        ]
+                    ]);
+                }
+            }
+        }
+
+    ?>
+    <?= ButtonGroup::widget([
+        'encodeLabels' => false,
+        'options' => [
+            'class' => 'pull-right',
+            'style' => 'display:block; margin: 15px 0px;'
+        ],
+        'buttons' => $buttons
+    ]); ?>
+
     <?php $form = ActiveForm::begin([
         'id' => "addPageForm",
         'enableAjaxValidation' => true

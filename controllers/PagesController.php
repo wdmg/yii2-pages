@@ -22,6 +22,11 @@ class PagesController extends Controller
     private $_locale;
 
     /**
+     * @var string|null Storaged selected id of source page
+     */
+    private $_source_id;
+
+    /**
      * {@inheritdoc}
      */
     public function behaviors()
@@ -69,6 +74,7 @@ class PagesController extends Controller
     public function beforeAction($action)
     {
         $this->_locale = Yii::$app->request->get('locale', null);
+        $this->_source_id = Yii::$app->request->get('source_id', null);
         return parent::beforeAction($action);
     }
 
@@ -98,6 +104,7 @@ class PagesController extends Controller
     {
         $model = new Pages();
         $model->scenario = $model::PAGE_SCENARIO_CREATE;
+
         $model->status = $model::PAGE_STATUS_DRAFT;
         $model->route = null;
         $model->layout = null;
@@ -124,6 +131,13 @@ class PagesController extends Controller
             }
         }
 
+        if (!is_null($this->_source_id)) {
+            $model->source_id = $this->_source_id;
+
+            if ($perent = Pages::findOne(['source_id' => $this->_source_id, 'locale' => $this->_locale]) !== null)
+                $model->perent_id = $perent->id;
+        }
+
         if (Yii::$app->request->isAjax) {
             if ($model->load(Yii::$app->request->post())) {
                 if ($model->validate())
@@ -134,6 +148,11 @@ class PagesController extends Controller
                 return $this->asJson(['success' => $success, 'alias' => $model->alias, 'errors' => $model->errors]);
             }
         } else {
+
+            /*if (Yii::$app->request->isPost && !$model->validate()) {
+                var_dump($model->errors);
+                die();
+            }*/
 
             if ($model->load(Yii::$app->request->post())) {
 
@@ -223,6 +242,11 @@ class PagesController extends Controller
 
                 // Get new URL for saved page
                 $newPageUrl = $model->getPageUrl(false);
+
+                if (Yii::$app->request->isPost && !$model->validate()) {
+                    var_dump($model->errors);
+                    die();
+                }
 
                 if($model->save()) {
 

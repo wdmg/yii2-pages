@@ -107,7 +107,7 @@ class Pages extends ActiveRecord
             ['route', 'match', 'pattern' => '/^[A-Za-z0-9\-\_\/]+$/', 'message' => Yii::t('app/modules/pages','It allowed only Latin alphabet, numbers and the «-», «_», «/» characters.')],
 
             ['locale', 'string', 'max' => 10],
-            ['locale', 'checkLocale'],
+            ['locale', 'checkLocale', 'on' => self::PAGE_SCENARIO_CREATE],
 
             [['parent_id', 'source_id'], 'doublesCheck', 'on' => self::PAGE_SCENARIO_CREATE],
 
@@ -213,7 +213,7 @@ class Pages extends ActiveRecord
     public function checkSource($attribute, $params)
     {
         $hasError = false;
-        if (!empty($this->source_id)) {
+        if (isset($this->source_id)) {
 
             if ($this->id == $this->source_id)
                 $hasError = true;
@@ -225,7 +225,7 @@ class Pages extends ActiveRecord
         }
 
         $hasError = false;
-        if (!empty($this->parent_id)) {
+        if (isset($this->parent_id)) {
 
             if ($this->id == $this->parent_id)
                 $hasError = true;
@@ -306,7 +306,7 @@ class Pages extends ActiveRecord
          */
         if (is_null($this->source_id) && !is_null($this->parent_id)) {
             $source = self::findOne(['parent_id' => $this->parent_id, 'source_id' => null]);
-            if (!is_null($source->id)) {
+            if (isset($source->id)) {
                 $this->source_id = $source->id;
             }
         }
@@ -422,11 +422,14 @@ class Pages extends ActiveRecord
             }
         }
 
-        if ($this->parent_id) {
+        if ($this->source_id) {
+            if ($parent = self::find()->where(['source_id' => intval($this->parent_id), 'locale' => $this->locale])->one())
+                return $parent->getRoute($route) ."/". $parent->alias;
+        } elseif ($this->parent_id) {
             if ($parent = self::find()->where(['id' => intval($this->parent_id)])->one())
                 return $parent->getRoute($route) ."/". $parent->alias;
-
         }
+
 
         return $route;
     }
@@ -619,4 +622,5 @@ class Pages extends ActiveRecord
 
         return $list;
     }
+
 }
