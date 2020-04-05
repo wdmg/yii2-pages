@@ -32,16 +32,41 @@ use wdmg\widgets\SelectInput;
 
         $locales = Yii::$app->translations->getLocales(false, false, true);
         $locales = ArrayHelper::map($locales, 'id', 'locale');
-        $locales = array_unique(ArrayHelper::merge($existing, $locales));
 
         if (isset(Yii::$app->translations)) {
             $bundle = \wdmg\translations\FlagsAsset::register(Yii::$app->view);
-            foreach ($locales as $item_locale) {
 
-                $locale = Yii::$app->translations->parseLocale($item_locale, Yii::$app->language);
+            // List of current language version of page (include source page)
+            foreach ($versions as $version) {
 
-                if ($item_locale === $locale['locale']) { // Fixing default locale from PECL intl
+                $locale = Yii::$app->translations->parseLocale($version['locale'], Yii::$app->language);
+                if (!($country = $locale['domain']))
+                    $country = '_unknown';
 
+                $flag = \yii\helpers\Html::img($bundle->baseUrl . '/flags-iso/flat/24/' . $country . '.png', [
+                    'alt' => $locale['name']
+                ]);
+
+                $buttons[] = Button::widget([
+                    'label' => $flag . '&nbsp;' . $locale['name'],
+                    'tagName' => 'a',
+                    'encodeLabel' => false,
+                    'options' => [
+                        'class' => 'btn btn-sm ' . (($model->locale == $locale['locale']) ? 'btn-primary' : 'btn-default'),
+                        'href' => $url = Url::to(['pages/update', 'id' => $version['id']]),
+                        'title' => Yii::t('app/modules/pages', 'Edit language version: {language}', [
+                            'language' => $locale['name']
+                        ]),
+                        'data-pjax' => 0
+                    ]
+                ]);
+            }
+
+            // List of available languages for add (exluding already existing)
+            foreach ($locales as $item) {
+
+                $locale = Yii::$app->translations->parseLocale($item, Yii::$app->language);
+                if ($item === $locale['locale']) { // Fixing default locale from PECL intl
                     if (!($country = $locale['domain']))
                         $country = '_unknown';
 
@@ -49,37 +74,49 @@ use wdmg\widgets\SelectInput;
                         'alt' => $locale['name']
                     ]);
 
-                    if (in_array($locale['locale'], $existing, true)) {
-
-                        if ($model->locale === $locale['locale']) {
-                            $url = Url::to(['pages/update', 'id' => $model->id]);
-                        } elseif ($model->source_id) {
-                            $url = Url::to(['pages/update', 'id' => $model->source_id]);
-                        } else {
-                            $url = Url::to(['pages/update', 'id' => $model->id, 'locale' => $locale['locale']]);
-                        }
-
-                    } else {
-                        $url = Url::to(['pages/create', 'source_id' => $model->id, 'locale' => $locale['locale']]);
+                    if (!in_array($locale['locale'], $existing, true)) {
+                        $buttons[] = Button::widget([
+                            'label' => $flag . '&nbsp;' . $locale['name'],
+                            'tagName' => 'a',
+                            'encodeLabel' => false,
+                            'options' => [
+                                'class' => 'btn btn-sm btn-default',
+                                'href' => Url::to(['pages/create', 'source_id' => (($model->source_id) ? $model->source_id : $model->id), 'locale' => $locale['locale']]),
+                                'title' => Yii::t('app/modules/pages', 'Add language version: {language}', [
+                                    'language' => $locale['name']
+                                ]),
+                                'data-pjax' => 0
+                            ]
+                        ]);
                     }
-
-                    $buttons[] = Button::widget([
-                        'label' => $flag . '&nbsp;' . $locale['name'],
-                        'tagName' => 'a',
-                        'encodeLabel' => false,
-                        'options' => [
-                            'class' => 'btn btn-sm ' . (($model->locale == $locale['locale']) ? 'btn-primary' : 'btn-default'),
-                            'href' => $url,
-                            'title' => Yii::t('app/modules/pages', 'Edit language version: {language}', [
-                                'language' => $locale['name']
-                            ]),
-                            'data-pjax' => 0
-                        ]
-                    ]);
                 }
-
             }
         } else {
+
+            // List of current language version of page (include source page)
+            foreach ($versions as $version) {
+
+                if (extension_loaded('intl'))
+                    $language = mb_convert_case(trim(\Locale::getDisplayLanguage($version['locale'], Yii::$app->language)), MB_CASE_TITLE, "UTF-8");
+                else
+                    $language = $version['locale'];
+
+                $buttons[] = Button::widget([
+                    'label' => $language,
+                    'tagName' => 'a',
+                    'encodeLabel' => false,
+                    'options' => [
+                        'class' => 'btn btn-sm ' . (($model->locale == $version['locale']) ? 'btn-primary' : 'btn-default'),
+                        'href' => Url::to(['pages/update', 'id' => $version['id']]),
+                        'title' => Yii::t('app/modules/pages', 'Edit language version: {language}', [
+                            'language' => $language
+                        ]),
+                        'data-pjax' => 0
+                    ]
+                ]);
+            }
+
+            // List of available languages for add (exluding already existing)
             foreach ($locales as $locale) {
                 if (!empty($locale)) {
 
@@ -88,29 +125,22 @@ use wdmg\widgets\SelectInput;
                     else
                         $language = $locale;
 
-                    if (array_search($locale, $existing, true)) {
-                        $url = Url::to(
-                            ($model->locale === $locale) ?
-                                ['pages/update', 'id' => $model->id] :
-                                ['pages/update', 'id' => $model->id, 'locale' => $locale]
-                        );
-                    } else {
-                        $url = Url::to(['pages/create', 'source_id' => $model->id, 'locale' => $locale]);
+                    if (!array_search($locale, $existing, true)) {
+                        $buttons[] = Button::widget([
+                            'label' => $language,
+                            'tagName' => 'a',
+                            'encodeLabel' => false,
+                            'options' => [
+                                'class' => 'btn btn-sm btn-default',
+                                'href' => Url::to(['pages/create', 'source_id' => (($model->source_id) ? $model->source_id : $model->id), 'locale' => $locale]),
+                                'title' => Yii::t('app/modules/pages', 'Add language version: {language}', [
+                                    'language' => $language
+                                ]),
+                                'data-pjax' => 0
+                            ]
+                        ]);
                     }
 
-                    $buttons[] = Button::widget([
-                        'label' => $language,
-                        'tagName' => 'a',
-                        'encodeLabel' => false,
-                        'options' => [
-                            'class' => 'btn btn-sm ' . (($model->locale === $locale) ? 'btn-primary' : 'btn-default'),
-                            'href' => $url,
-                            'title' => Yii::t('app/modules/pages', 'Edit language version: {language}', [
-                                'language' => $language
-                            ]),
-                            'data-pjax' => 0
-                        ]
-                    ]);
                 }
             }
         }
