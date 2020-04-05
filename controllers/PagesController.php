@@ -397,4 +397,18 @@ class PagesController extends Controller
 
         throw new NotFoundHttpException(Yii::t('app/modules/pages', 'The requested page does not exist.'));
     }
+
+    /**
+     * @return string|null
+     */
+    public function getLocale() {
+        return $this->_locale;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSourceId() {
+        return $this->_source_id;
+    }
 }
