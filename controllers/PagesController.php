@@ -133,9 +133,14 @@ class PagesController extends Controller
 
         if (!is_null($this->_source_id)) {
             $model->source_id = $this->_source_id;
-
-            if ($perent = Pages::findOne(['source_id' => $this->_source_id, 'locale' => $this->_locale]) !== null)
-                $model->perent_id = $perent->id;
+            if ($parent = $model::findOne(['id' => $this->_source_id])) {
+                if ($parent->id) {
+                    $model->source_id = $parent->id;
+                }
+                if ($parent->parent_id) {
+                    $model->parent_id = $parent->parent_id;
+                }
+            }
         }
 
         if (Yii::$app->request->isAjax) {

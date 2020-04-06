@@ -96,6 +96,7 @@ return [
     'Source ID' => 'ИД исходника',
     'Language' => 'Язык',
     'Languages' => 'Языки',
+    'Language version' => 'Языковая версия',
     'All languages' => 'Все языки',
     'Not selected' => 'Не выбран',
     'It looks like the same language version of page or child page already exists.' => 'Похоже, что такая же языковая версия или дочерняя страница уже существует.',

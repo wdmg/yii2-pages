@@ -44,12 +44,26 @@ class Pages extends ActiveRecord
 
     public $url;
 
+    private $_module;
+
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
         return '{{%pages}}';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        parent::init();
+
+        if (!($this->_module = Yii::$app->getModule('admin/pages', false)))
+            $this->_module = Yii::$app->getModule('pages', false);
+
     }
 
     /**
@@ -319,6 +333,9 @@ class Pages extends ActiveRecord
      */
     public function beforeSave($insert)
     {
+        if (empty($this->title) && !empty($this->name))
+            $this->title = $this->name;
+
         if (empty(trim($this->route)))
             $this->route = null;
         else
@@ -445,10 +462,24 @@ class Pages extends ActiveRecord
     {
         $this->route = $this->getRoute();
         if (isset($this->alias)) {
-            if ($this->status == self::PAGE_STATUS_DRAFT && $realUrl)
-                return \yii\helpers\Url::to(['default/index', 'route' => $this->route, 'page' => $this->alias, 'draft' => 'true'], $withScheme);
-            else
-                return \yii\helpers\Url::to($this->route . '/' .$this->alias, $withScheme);
+            if (isset(Yii::$app->translations) && class_exists('wdmg\translations\models\Languages')) {
+                $translations = Yii::$app->translations->module;
+                if ($config = $translations->urlManagerConfig) {
+                    // Init UrlManager and configure
+                    $urlManager = new \wdmg\translations\components\UrlManager($config);
+                    if ($this->status == self::PAGE_STATUS_DRAFT && $realUrl) {
+                        return $urlManager->createUrl(['default/index', 'route' => $this->route, 'page' => $this->alias, 'lang' => $this->locale, 'draft' => 'true']);
+                    } else {
+                        return $urlManager->createUrl([$this->route . '/' . $this->alias, 'lang' => $this->locale], $withScheme);
+                    }
+                }
+            } else {
+                if ($this->status == self::PAGE_STATUS_DRAFT && $realUrl) {
+                    return \yii\helpers\Url::to(['default/index', 'route' => $this->route, 'page' => $this->alias, 'draft' => 'true'], $withScheme);
+                } else {
+                    return \yii\helpers\Url::to($this->route . '/' . $this->alias, $withScheme);
+                }
+            }
 
         } else {
             return null;
@@ -547,6 +578,8 @@ class Pages extends ActiveRecord
 
 
     /**
+     * Returns a list of all language versions of current page.
+     *
      * @param null $source_id
      * @param bool $asArray
      * @return array|\yii\db\ActiveQuery|ActiveRecord[]|null
@@ -565,7 +598,10 @@ class Pages extends ActiveRecord
     }
 
     /**
+     * Returns a list of all languages used for current page.
      *
+     * @param null $id
+     * @param bool $asArray
      * @return array
      */
     public function getLanguages($id = null, $asArray = false)
@@ -599,8 +635,11 @@ class Pages extends ActiveRecord
     }
 
     /**
+     * Returns a list of all available languages. Including taking into account already used as the language versions
+     * of pages. If the `wdmg\yii2-translations` module with the list of active languages is not available,
+     * the `$supportLanguages` parameter of the current module will be used.
+     *
      * @param bool $allLanguages
-     * @param bool $onlyUsed
      * @return array
      */
     public function getLanguagesList($allLanguages = false)
@@ -613,9 +652,25 @@ class Pages extends ActiveRecord
         }
 
         $languages = $this->getLanguages(null, false);
-        if (isset(Yii::$app->translations)) {
+        if (isset(Yii::$app->translations) && class_exists('wdmg\translations\models\Languages')) {
             $locales = Yii::$app->translations->getLocales(false, false, true);
             $languages = array_diff_assoc(ArrayHelper::map($locales, 'locale', 'name'), $languages);
+        } else {
+            if (is_array($this->_module->supportLocales)) {
+                $supportLanguages = [];
+                $locales = $this->_module->supportLocales;
+                foreach ($locales as $locale) {
+
+                    if (extension_loaded('intl'))
+                        $language = mb_convert_case(trim(\Locale::getDisplayLanguage($locale, Yii::$app->language)), MB_CASE_TITLE, "UTF-8");
+                    else
+                        $language = $locale;
+
+                    $supportLanguages = ArrayHelper::merge($supportLanguages, [$locale => $language]);
+                }
+
+                $languages = array_diff_assoc($supportLanguages, $languages);
+            }
         }
 
         $list = ArrayHelper::merge($list, $languages);

@@ -65,6 +65,12 @@ class Module extends BaseModule
     public $pagesLayout = "@app/views/layouts/main";
 
     /**
+     * @var array, the list of support locales for multi-language versions of page.
+     * @note This variable will be override if you use the `wdmg\yii2-translations` module.
+     */
+    public $supportLocales = ['ru-RU', 'en-US', 'uk-UA', 'de-DE'];
+
+    /**
      * {@inheritdoc}
      */
     public function init()
@@ -129,6 +135,9 @@ class Module extends BaseModule
 
         if (isset(Yii::$app->params["pages.pagesRoute"]))
             $this->pagesRoute = Yii::$app->params["pages.pagesRoute"];
+
+        if (isset(Yii::$app->params["pages.supportLocales"]))
+            $this->supportLocales = Yii::$app->params["pages.supportLocales"];
 
         if (!isset($this->pagesRoute))
             throw new InvalidConfigException("Required module property `pagesRoute` isn't set.");

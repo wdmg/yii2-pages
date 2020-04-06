@@ -30,10 +30,11 @@ use wdmg\widgets\SelectInput;
             $existing = [];
         }
 
-        $locales = Yii::$app->translations->getLocales(false, false, true);
-        $locales = ArrayHelper::map($locales, 'id', 'locale');
+        if (isset(Yii::$app->translations) && class_exists('wdmg\translations\models\Languages')) {
 
-        if (isset(Yii::$app->translations)) {
+            $locales = Yii::$app->translations->getLocales(false, false, true);
+            $locales = ArrayHelper::map($locales, 'id', 'locale');
+
             $bundle = \wdmg\translations\FlagsAsset::register(Yii::$app->view);
 
             // List of current language version of page (include source page)
@@ -53,7 +54,7 @@ use wdmg\widgets\SelectInput;
                         'tagName' => 'a',
                         'encodeLabel' => false,
                         'options' => [
-                            'class' => 'btn btn-sm ' . (($model->locale == $locale['locale']) ? 'btn-primary' : 'btn-default'),
+                            'class' => 'btn btn-sm btn-edit ' . (($model->locale == $locale['locale']) ? 'btn-primary' : 'btn-default'),
                             'href' => $url = Url::to(['pages/update', 'id' => $version['id']]),
                             'title' => Yii::t('app/modules/pages', 'Edit language version: {language}', [
                                 'language' => $locale['name']
@@ -81,7 +82,7 @@ use wdmg\widgets\SelectInput;
                             'tagName' => 'a',
                             'encodeLabel' => false,
                             'options' => [
-                                'class' => 'btn btn-sm ' . (($this->context->getLocale() == $locale['locale']) ? 'btn-primary' : 'btn-default'),
+                                'class' => 'btn btn-sm btn-add ' . (($this->context->getLocale() == $locale['locale']) ? 'btn-primary' : 'btn-default'),
                                 'href' => Url::to(['pages/create', 'source_id' => (($model->source_id) ? $model->source_id : $model->id), 'locale' => $locale['locale']]),
                                 'title' => Yii::t('app/modules/pages', 'Add language version: {language}', [
                                     'language' => $locale['name']
@@ -108,7 +109,7 @@ use wdmg\widgets\SelectInput;
                         'tagName' => 'a',
                         'encodeLabel' => false,
                         'options' => [
-                            'class' => 'btn btn-sm ' . (($model->locale == $version['locale']) ? 'btn-primary' : 'btn-default'),
+                            'class' => 'btn btn-sm btn-edit ' . (($model->locale == $version['locale']) ? 'btn-primary' : 'btn-default'),
                             'href' => Url::to(['pages/update', 'id' => $version['id']]),
                             'title' => Yii::t('app/modules/pages', 'Edit language version: {language}', [
                                 'language' => $language
@@ -120,21 +121,21 @@ use wdmg\widgets\SelectInput;
             }
 
             // List of available languages for add (exluding already existing)
-            foreach ($locales as $locale) {
+            foreach ($this->context->module->supportLocales as $locale) {
                 if (!empty($locale)) {
-
-                    if (extension_loaded('intl'))
-                        $language = mb_convert_case(trim(\Locale::getDisplayLanguage($locale, Yii::$app->language)), MB_CASE_TITLE, "UTF-8");
-                    else
-                        $language = $locale;
-
                     if (!array_search($locale, $existing, true)) {
+
+                        if (extension_loaded('intl'))
+                            $language = mb_convert_case(trim(\Locale::getDisplayLanguage($locale, Yii::$app->language)), MB_CASE_TITLE, "UTF-8");
+                        else
+                            $language = $locale;
+
                         $buttons[] = Button::widget([
                             'label' => $language,
                             'tagName' => 'a',
                             'encodeLabel' => false,
                             'options' => [
-                                'class' => 'btn btn-sm ' . (($this->context->getLocale() == $locale) ? 'btn-primary' : 'btn-default'),
+                                'class' => 'btn btn-sm btn-add ' . (($this->context->getLocale() == $locale) ? 'btn-primary' : 'btn-default'),
                                 'href' => Url::to(['pages/create', 'source_id' => (($model->source_id) ? $model->source_id : $model->id), 'locale' => $locale]),
                                 'title' => Yii::t('app/modules/pages', 'Add language version: {language}', [
                                     'language' => $language
@@ -148,15 +149,27 @@ use wdmg\widgets\SelectInput;
             }
         }
 
+        // Render the locale switcher
+        if (!empty($buttons) && is_array($buttons)) {
+            echo '<div class="form-group">';
+
+            echo Html::tag('label', Yii::t('app/modules/pages', 'Language version'), [
+                'for' => 'locale-switcher',
+                'class' => 'control-label',
+                'style' => 'display:inline-block;vertical-align:middle;float:none;padding-top:6px;'
+            ]);
+
+            echo ButtonGroup::widget([
+                'encodeLabels' => false,
+                'options' => [
+                    'id' => 'locale-switcher',
+                    'class' => 'pull-right'
+                ],
+                'buttons' => $buttons
+            ]);
+            echo '</div>';
+        }
     ?>
-    <?= ButtonGroup::widget([
-        'encodeLabels' => false,
-        'options' => [
-            'class' => 'pull-right',
-            'style' => 'display:block; margin: 15px 0px;'
-        ],
-        'buttons' => $buttons
-    ]); ?>
 
     <?php $form = ActiveForm::begin([
         'id' => "addPageForm",
