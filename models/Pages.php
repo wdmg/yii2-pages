@@ -363,7 +363,7 @@ class Pages extends ActiveRecord
     public function afterFind()
     {
         parent::afterFind();
-        $this->url = $this->getPageUrl();
+        $this->url = $this->getPageUrl(true, true);
     }
 
     /**
@@ -458,26 +458,36 @@ class Pages extends ActiveRecord
      * @param bool $realUrl
      * @return null|string
      */
-    public function getPageUrl($withScheme = true, $realUrl = true)
+    public function getPageUrl($absoluteUrl = true, $realUrl = false)
     {
         $this->route = $this->getRoute();
         if (isset($this->alias)) {
             if (isset(Yii::$app->translations) && class_exists('wdmg\translations\models\Languages')) {
                 $translations = Yii::$app->translations->module;
                 if ($config = $translations->urlManagerConfig) {
+
+                    if (isset($config['class']))
+                        unset($config['class']);
+
                     // Init UrlManager and configure
                     $urlManager = new \wdmg\translations\components\UrlManager($config);
                     if ($this->status == self::PAGE_STATUS_DRAFT && $realUrl) {
+                        if ($absoluteUrl)
+                        return $urlManager->createAbsoluteUrl(['default/index', 'route' => $this->route, 'page' => $this->alias, 'lang' => $this->locale, 'draft' => 'true']);
+                            else
                         return $urlManager->createUrl(['default/index', 'route' => $this->route, 'page' => $this->alias, 'lang' => $this->locale, 'draft' => 'true']);
                     } else {
-                        return $urlManager->createUrl([$this->route . '/' . $this->alias, 'lang' => $this->locale], $withScheme);
+                        if ($absoluteUrl)
+                            return $urlManager->createAbsoluteUrl([$this->route . '/' . $this->alias, 'lang' => $this->locale]);
+                        else
+                            return $urlManager->createUrl([$this->route . '/' . $this->alias, 'lang' => $this->locale]);
                     }
                 }
             } else {
                 if ($this->status == self::PAGE_STATUS_DRAFT && $realUrl) {
-                    return \yii\helpers\Url::to(['default/index', 'route' => $this->route, 'page' => $this->alias, 'draft' => 'true'], $withScheme);
+                    return \yii\helpers\Url::to(['default/index', 'route' => $this->route, 'page' => $this->alias, 'draft' => 'true'], $absoluteUrl);
                 } else {
-                    return \yii\helpers\Url::to($this->route . '/' . $this->alias, $withScheme);
+                    return \yii\helpers\Url::to($this->route . '/' . $this->alias);
                 }
             }
 

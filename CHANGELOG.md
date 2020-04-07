@@ -2,7 +2,8 @@ Changelog
 =========
 
 ## 1.2.*
- * Fixed getPageUrl() method.
+ * Method getPageUrl() refactoring
+ * Fixed getPageUrl() method
  * Added `supportLocales` module properties, fixed Pages form
  * Added rules and checker for Pages model
  * Multi-language implementation
