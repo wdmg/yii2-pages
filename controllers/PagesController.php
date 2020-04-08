@@ -17,6 +17,16 @@ class PagesController extends Controller
 {
 
     /**
+     * @var string|null Storaged selected language (locale)
+     */
+    private $_locale;
+
+    /**
+     * @var string|null Storaged selected id of source page
+     */
+    private $_source_id;
+
+    /**
      * {@inheritdoc}
      */
     public function behaviors()
@@ -62,8 +72,19 @@ class PagesController extends Controller
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function beforeAction($action)
+    {
+        $this->_locale = Yii::$app->request->get('locale', null);
+        $this->_source_id = Yii::$app->request->get('source_id', null);
+        return parent::beforeAction($action);
+    }
+
+    /**
      * Lists of all Pages models.
-     * @return mixed
+     *
+     * @return string
      */
     public function actionIndex()
     {
@@ -77,18 +98,54 @@ class PagesController extends Controller
         ]);
     }
 
-
     /**
      * Creates a new Page model.
      * If creation is successful, the browser will be redirected to the list of pages.
-     * @return mixed
+     *
+     * @return string|\yii\web\Response
      */
     public function actionCreate()
     {
         $model = new Pages();
+        $model->scenario = $model::PAGE_SCENARIO_CREATE;
+
         $model->status = $model::PAGE_STATUS_DRAFT;
         $model->route = null;
         $model->layout = null;
+
+        // No language is set for this model, we will use the current user language
+        if (is_null($model->locale)) {
+            if (is_null($this->_locale)) {
+                $model->locale = Yii::$app->language;
+                if (!Yii::$app->request->isPost) {
+                    $languages = $model->getLanguagesList(false);
+                    Yii::$app->getSession()->setFlash(
+                        'danger',
+                        Yii::t(
+                            'app/modules/pages',
+                            'No display language has been set for this page. When saving, the current user language will be selected: {language}',
+                            [
+                                'language' => (isset($languages[Yii::$app->language])) ? $languages[Yii::$app->language] : Yii::$app->language
+                            ]
+                        )
+                    );
+                }
+            } else {
+                $model->locale = $this->_locale;
+            }
+        }
+
+        if (!is_null($this->_source_id)) {
+            $model->source_id = $this->_source_id;
+            if ($parent = $model::findOne(['id' => $this->_source_id])) {
+                if ($parent->id) {
+                    $model->source_id = $parent->id;
+                }
+                if ($parent->parent_id) {
+                    $model->parent_id = $parent->parent_id;
+                }
+            }
+        }
 
         if (Yii::$app->request->isAjax) {
             if ($model->load(Yii::$app->request->post())) {
@@ -100,6 +157,7 @@ class PagesController extends Controller
                 return $this->asJson(['success' => $success, 'alias' => $model->alias, 'errors' => $model->errors]);
             }
         } else {
+
             if ($model->load(Yii::$app->request->post())) {
 
                 if ($model->save()) {
@@ -144,13 +202,32 @@ class PagesController extends Controller
     /**
      * Updates an existing Page model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     *
+     * @param $id
+     * @return string|\yii\web\Response
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+
+        // No language is set for this model, we will use the current user language
+        if (is_null($model->locale)) {
+            $model->locale = Yii::$app->language;
+            if (!Yii::$app->request->isPost) {
+                $languages = $model->getLanguagesList(false);
+                Yii::$app->getSession()->setFlash(
+                    'danger',
+                    Yii::t(
+                        'app/modules/pages',
+                        'No display language has been set for this page. When saving, the current user language will be selected: {language}',
+                        [
+                            'language' => (isset($languages[Yii::$app->language])) ? $languages[Yii::$app->language] : Yii::$app->language
+                        ]
+                    )
+                );
+            }
+        }
 
         // Get current URL before save this page
         $oldPageUrl = $model->getPageUrl(false);
@@ -165,6 +242,7 @@ class PagesController extends Controller
                 return $this->asJson(['success' => $success, 'alias' => $model->alias, 'errors' => $model->errors]);
             }
         } else {
+
             if ($model->load(Yii::$app->request->post())) {
 
                 // Get new URL for saved page
@@ -228,9 +306,10 @@ class PagesController extends Controller
 
     /**
      * Displays a single Page model.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     *
+     * @param $id
+     * @return string
+     * @throws NotFoundHttpException
      */
     public function actionView($id)
     {
@@ -244,9 +323,12 @@ class PagesController extends Controller
     /**
      * Deletes an existing Pages model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     *
+     * @param $id
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
      */
     public function actionDelete($id)
     {
@@ -300,17 +382,37 @@ class PagesController extends Controller
 
     /**
      * Finds the Pages model based on its primary key value.
+     * If the private variable $this->_locale contains the locale, the language version is returned.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return Settings the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
+     *
+     * @param $id
+     * @return Pages|null
+     * @throws NotFoundHttpException
      */
     protected function findModel($id)
     {
-        if (($model = Pages::findOne($id)) !== null) {
+
+        if (is_null($this->_locale) && ($model = Pages::findOne($id)) !== null) {
             return $model;
+        } else {
+            if (($model = Pages::findOne(['source_id' => $id, 'locale' => $this->_locale])) !== null)
+                return $model;
         }
 
         throw new NotFoundHttpException(Yii::t('app/modules/pages', 'The requested page does not exist.'));
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLocale() {
+        return $this->_locale;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSourceId() {
+        return $this->_source_id;
     }
 }

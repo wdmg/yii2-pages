@@ -17,6 +17,7 @@ use yii\behaviors\SluggableBehavior;
  *
  * @property int $id
  * @property int $parent_id
+ * @property int $source_id
  * @property string $name
  * @property string $alias
  * @property string $content
@@ -26,6 +27,7 @@ use yii\behaviors\SluggableBehavior;
  * @property boolean $in_sitemap
  * @property boolean $in_turbo
  * @property boolean $in_amp
+ * @property string $locale
  * @property boolean $status
  * @property string $route
  * @property string $layout
@@ -38,8 +40,17 @@ class Pages extends ActiveRecord
 {
     const PAGE_STATUS_DRAFT = 0; // Page has draft
     const PAGE_STATUS_PUBLISHED = 1; // Page has been published
+    const PAGE_SCENARIO_CREATE = 'create';
 
+    /**
+     * @var string
+     */
     public $url;
+
+    /**
+     * @var object
+     */
+    private $_module;
 
     /**
      * {@inheritdoc}
@@ -47,6 +58,18 @@ class Pages extends ActiveRecord
     public static function tableName()
     {
         return '{{%pages}}';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        parent::init();
+
+        if (!($this->_module = Yii::$app->getModule('admin/pages', false)))
+            $this->_module = Yii::$app->getModule('pages', false);
+
     }
 
     /**
@@ -90,20 +113,28 @@ class Pages extends ActiveRecord
     public function rules()
     {
         $rules = [
-            ['parent_id', 'integer'],
-            [['name', 'alias', 'content'], 'required'],
+            [['name', 'alias', 'content', 'locale'], 'required'],
             [['name', 'alias'], 'string', 'min' => 3, 'max' => 128],
             [['name', 'alias'], 'string', 'min' => 3, 'max' => 128],
             [['title', 'description', 'keywords'], 'string', 'max' => 255],
             [['status', 'in_sitemap', 'in_turbo', 'in_amp'], 'boolean'],
 
-            ['route', 'string', 'max' => 32],
+            [['parent_id', 'source_id'], 'integer'],
+            ['parent_id', 'checkParent'],
+            ['source_id', 'checkSource'],
+
+            ['route', 'string', 'max' => 255],
             ['route', 'match', 'pattern' => '/^[A-Za-z0-9\-\_\/]+$/', 'message' => Yii::t('app/modules/pages','It allowed only Latin alphabet, numbers and the «-», «_», «/» characters.')],
+
+            ['locale', 'string', 'max' => 10],
+            ['locale', 'checkLocale', 'on' => self::PAGE_SCENARIO_CREATE],
+
+            [['parent_id', 'source_id'], 'doublesCheck', 'on' => self::PAGE_SCENARIO_CREATE],
 
             ['layout', 'string', 'max' => 64],
             ['layout', 'match', 'pattern' => '/^[A-Za-z0-9\-\_\/\@]+$/', 'message' => Yii::t('app/modules/pages','It allowed only Latin alphabet, numbers and the «@», «-», «_», «/» characters.')],
 
-            ['alias', 'unique', 'message' => Yii::t('app/modules/pages', 'Param attribute must be unique.')],
+            ['alias', 'checkAlias'],
             ['alias', 'match', 'pattern' => '/^[A-Za-z0-9\-\_]+$/', 'message' => Yii::t('app/modules/pages','It allowed only Latin alphabet, numbers and the «-», «_» characters.')],
             [['created_at', 'updated_at'], 'safe'],
         ];
@@ -114,6 +145,146 @@ class Pages extends ActiveRecord
 
         return $rules;
     }
+
+    /**
+     * Checks if there is a page (language version) with the same parent, source version and language locale.
+     * Used according by the scenario when creating a new page.
+     *
+     * @param $attribute
+     * @param $params
+     * @return bool
+     */
+    public function doublesCheck($attribute, $params)
+    {
+        $hasError = false;
+        if (!empty($this->parent_id) && !empty($this->source_id) && !empty($this->locale)) {
+
+            if (self::find()->where(['parent_id' => $this->parent_id, 'source_id' => $this->source_id, 'locale' => $this->locale])->count())
+                $hasError = true;
+
+        }
+
+        if ($hasError) {
+            $this->addError($attribute, Yii::t('app/modules/pages', 'It looks like the same language version of page or child page already exists.'));
+        }
+
+        return $hasError;
+    }
+
+    /**
+     * Checks if the current page (language version) links to a page that is not the main version.
+     *
+     * @param $attribute
+     * @param $params
+     * @return bool
+     */
+    public function checkParent($attribute, $params)
+    {
+        $hasError = false;
+        if (!empty($this->parent_id) && !empty($this->source_id)) {
+
+            if (self::find()->where(['id' => $this->parent_id])->andWhere(['!=', 'source_id', null])->count())
+                $hasError = true;
+
+        }
+
+        if ($hasError) {
+            $this->addError($attribute, Yii::t('app/modules/pages', 'Child page cannot link to the language version of the page.'));
+        }
+
+        return $hasError;
+    }
+
+    /**
+     * Checks if the alias of the current page is not an alias duplicate of the main version.
+     *
+     * @param $attribute
+     * @param $params
+     * @return bool
+     */
+    public function checkAlias($attribute, $params)
+    {
+        $hasError = false;
+        if (!empty($this->alias) && !empty($this->source_id)) {
+
+            if (self::find()->where(['alias' => $this->alias])->andWhere(['!=', 'source_id', $this->source_id])->count())
+                $hasError = true;
+
+            if (self::find()->where(['alias' => $this->alias, 'source_id' => null])->andWhere(['!=', 'id', $this->id])->count())
+                $hasError = true;
+
+        }
+
+        if ($hasError) {
+            $this->addError($attribute, Yii::t('app/modules/pages', 'Param attribute must be unique.'));
+        }
+
+        return $hasError;
+    }
+
+    /**
+     * Checks if the current language version of the page is referencing itself
+     *
+     * @param $attribute
+     * @param $params
+     * @return bool
+     */
+    public function checkSource($attribute, $params)
+    {
+        $hasError = false;
+        if (isset($this->source_id)) {
+
+            if ($this->id == $this->source_id)
+                $hasError = true;
+
+        }
+
+        if ($hasError) {
+            $this->addError($attribute, Yii::t('app/modules/pages', 'The language version must refer to the main version.'));
+        }
+
+        $hasError = false;
+        if (isset($this->parent_id)) {
+
+            if ($this->id == $this->parent_id)
+                $hasError = true;
+
+        }
+
+        if ($hasError) {
+            $this->addError($attribute, Yii::t('app/modules/pages', 'The current page should not link to itself.'));
+        }
+
+        return $hasError;
+    }
+
+    /**
+     * Checks if the same language version of the current page exists.
+     *
+     * @param $attribute
+     * @param $params
+     * @return bool
+     */
+    public function checkLocale($attribute, $params)
+    {
+        $hasError = false;
+        if (!empty($this->locale) && !empty($this->source_id)) {
+
+            if (self::find()->where(['locale' => $this->locale, 'source_id' => $this->source_id])->andWhere(['!=', 'id', $this->id])->count())
+                $hasError = true;
+
+            if (self::find()->where(['locale' => $this->locale, 'id' => $this->source_id])->count())
+                $hasError = true;
+
+        }
+
+        if ($hasError) {
+            $this->addError($attribute, Yii::t('app/modules/pages', 'A language version with the selected language already exists.'));
+        }
+
+        return $hasError;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -122,6 +293,7 @@ class Pages extends ActiveRecord
         return [
             'id' => Yii::t('app/modules/pages', 'ID'),
             'parent_id' => Yii::t('app/modules/pages', 'Parent ID'),
+            'source_id' => Yii::t('app/modules/pages', 'Source ID'),
             'name' => Yii::t('app/modules/pages', 'Name'),
             'alias' => Yii::t('app/modules/pages', 'Alias'),
             'content' => Yii::t('app/modules/pages', 'Content'),
@@ -131,6 +303,7 @@ class Pages extends ActiveRecord
             'in_sitemap' => Yii::t('app/modules/pages', 'In sitemap?'),
             'in_turbo' => Yii::t('app/modules/pages', 'Yandex turbo-pages?'),
             'in_amp' => Yii::t('app/modules/pages', 'Google AMP?'),
+            'locale' => Yii::t('app/modules/pages', 'Locale'),
             'status' => Yii::t('app/modules/pages', 'Status'),
             'route' => Yii::t('app/modules/pages', 'Route'),
             'layout' => Yii::t('app/modules/pages', 'Layout'),
@@ -144,8 +317,30 @@ class Pages extends ActiveRecord
     /**
      * @inheritdoc
      */
+    public function beforeValidate()
+    {
+        /**
+         * If the parent of the page was specified but the language version is retained, you must obtain one
+         * `id` of the main version of the page and link to it the current page
+         */
+        if (is_null($this->source_id) && !is_null($this->parent_id)) {
+            $source = self::findOne(['parent_id' => $this->parent_id, 'source_id' => null]);
+            if (isset($source->id)) {
+                $this->source_id = $source->id;
+            }
+        }
+
+        return parent::beforeValidate();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function beforeSave($insert)
     {
+        if (empty($this->title) && !empty($this->name))
+            $this->title = $this->name;
+
         if (empty(trim($this->route)))
             $this->route = null;
         else
@@ -173,7 +368,7 @@ class Pages extends ActiveRecord
     public function afterFind()
     {
         parent::afterFind();
-        $this->url = $this->getPageUrl();
+        $this->url = $this->getPageUrl(true, true);
     }
 
     /**
@@ -249,11 +444,14 @@ class Pages extends ActiveRecord
             }
         }
 
-        if ($this->parent_id) {
+        if ($this->source_id) {
+            if ($parent = self::find()->where(['source_id' => intval($this->parent_id), 'locale' => $this->locale])->one())
+                return $parent->getRoute($route) ."/". $parent->alias;
+        } elseif ($this->parent_id) {
             if ($parent = self::find()->where(['id' => intval($this->parent_id)])->one())
                 return $parent->getRoute($route) ."/". $parent->alias;
-
         }
+
 
         return $route;
     }
@@ -265,14 +463,38 @@ class Pages extends ActiveRecord
      * @param bool $realUrl
      * @return null|string
      */
-    public function getPageUrl($withScheme = true, $realUrl = true)
+    public function getPageUrl($absoluteUrl = true, $realUrl = false)
     {
         $this->route = $this->getRoute();
         if (isset($this->alias)) {
-            if ($this->status == self::PAGE_STATUS_DRAFT && $realUrl)
-                return \yii\helpers\Url::to(['default/index', 'route' => $this->route, 'page' => $this->alias, 'draft' => 'true'], $withScheme);
-            else
-                return \yii\helpers\Url::to($this->route . '/' .$this->alias, $withScheme);
+            if (isset(Yii::$app->translations) && class_exists('wdmg\translations\models\Languages')) {
+                $translations = Yii::$app->translations->module;
+                if ($config = $translations->urlManagerConfig) {
+
+                    if (isset($config['class']))
+                        unset($config['class']);
+
+                    // Init UrlManager and configure
+                    $urlManager = new \wdmg\translations\components\UrlManager($config);
+                    if ($this->status == self::PAGE_STATUS_DRAFT && $realUrl) {
+                        if ($absoluteUrl)
+                            return \yii\helpers\Url::to(['default/view', 'route' => $this->route, 'alias' => $this->alias, 'draft' => 'true'], $absoluteUrl);
+                        else
+                            return \yii\helpers\Url::to(['default/view', 'route' => $this->route, 'alias' => $this->alias, 'draft' => 'true']);
+                    } else {
+                        if ($absoluteUrl)
+                            return $urlManager->createAbsoluteUrl([$this->route . '/' . $this->alias, 'lang' => $this->locale]);
+                        else
+                            return $urlManager->createUrl([$this->route . '/' . $this->alias, 'lang' => $this->locale]);
+                    }
+                }
+            } else {
+                if ($this->status == self::PAGE_STATUS_DRAFT && $realUrl) {
+                    return \yii\helpers\Url::to(['default/view', 'route' => $this->route, 'alias' => $this->alias, 'draft' => 'true'], $absoluteUrl);
+                } else {
+                    return \yii\helpers\Url::to($this->route . '/' . $this->alias);
+                }
+            }
 
         } else {
             return null;
@@ -317,11 +539,13 @@ class Pages extends ActiveRecord
     /**
      * Returns published pages
      *
-     * @param null $cond sampling conditions
-     * @param bool $asArray flag if necessary to return as an array
-     * @return array|ActiveRecord|null
+     * @param null $cond
+     * @param bool $asArray
+     * @param bool $onlyOne
+     * @return array|ActiveRecord|ActiveRecord[]|null
      */
-    public function getPublished($cond = null, $asArray = false) {
+    public static function getPublished($cond = null, $asArray = false, $onlyOne = false) {
+
         if (!is_null($cond) && is_array($cond))
             $models = self::find()->where(ArrayHelper::merge($cond, ['status' => self::PAGE_STATUS_PUBLISHED]));
         elseif (!is_null($cond) && is_string($cond))
@@ -329,30 +553,45 @@ class Pages extends ActiveRecord
         else
             $models = self::find()->where(['status' => self::PAGE_STATUS_PUBLISHED]);
 
-        if ($asArray)
-            return $models->asArray()->all();
-        else
-            return $models->all();
+        if ($asArray) {
+            if ($onlyOne)
+                return $models->asArray()->one();
+            else
+                return $models->asArray()->all();
+        } else {
+            if ($onlyOne)
+                return $models->one();
+            else
+                return $models->all();
+        }
 
     }
 
     /**
      * Returns all pages (draft and published)
      *
-     * @param null $cond sampling conditions
-     * @param bool $asArray flag if necessary to return as an array
-     * @return array|ActiveRecord|null
+     * @param null $cond
+     * @param bool $asArray
+     * @param bool $onlyOne
+     * @return array|ActiveRecord|ActiveRecord[]|null
      */
-    public function getAll($cond = null, $asArray = false) {
+    public function getAll($cond = null, $asArray = false, $onlyOne = false) {
         if (!is_null($cond))
             $models = self::find()->where($cond);
         else
             $models = self::find();
 
-        if ($asArray)
-            return $models->asArray()->all();
-        else
-            return $models->all();
+        if ($asArray) {
+            if ($onlyOne)
+                return $models->asArray()->one();
+            else
+                return $models->asArray()->all();
+        } else {
+            if ($onlyOne)
+                return $models->one();
+            else
+                return $models->all();
+        }
 
     }
 
@@ -368,4 +607,107 @@ class Pages extends ActiveRecord
 
         return $this->url;
     }
+
+    /**
+     * Returns a list of all language versions of current page.
+     *
+     * @param null $source_id
+     * @param bool $asArray
+     * @return array|\yii\db\ActiveQuery|ActiveRecord[]|null
+     */
+    public function getAllVersions($source_id = null, $asArray = false)
+    {
+        if (is_null($source_id))
+            return null;
+
+        $models = self::find()->andWhere(['id' => $source_id])->orWhere(['source_id' => $source_id]);
+
+        if ($asArray)
+            return $models->asArray()->all();
+        else
+            return $models;
+    }
+
+    /**
+     * Returns a list of all languages used for pages.
+     *
+     * @param null $id
+     * @param bool $asArray
+     * @return array
+     */
+    public function getLanguages($id = null, $asArray = false)
+    {
+
+        if (!($models = $this->getAllVersions($id, false))) {
+            $models = self::find();
+        }
+
+        $models->select('locale')->groupBy('locale');
+
+        if ($asArray)
+            $models->asArray();
+
+        $languages = [];
+        $locales = ArrayHelper::getColumn($models->all(), 'locale');
+        foreach ($locales as $locale) {
+            if (!is_null($locale)) {
+                if (extension_loaded('intl')) {
+                    $languages[] = [
+                        $locale => mb_convert_case(trim(\Locale::getDisplayLanguage($locale, Yii::$app->language)), MB_CASE_TITLE, "UTF-8"),
+                    ];
+                } else {
+                    $languages[] = [
+                        $locale => $locale,
+                    ];
+                }
+            }
+        }
+
+        return $languages;
+    }
+
+    /**
+     * Returns a list of all available languages. Including taking into account already used as the language versions
+     * of pages. If the `wdmg\yii2-translations` module with the list of active languages is not available,
+     * the `$supportLanguages` parameter of the current module will be used.
+     *
+     * @param bool $allLanguages
+     * @return array
+     */
+    public function getLanguagesList($allLanguages = false)
+    {
+        $list = [];
+        if ($allLanguages) {
+            $list = [
+                '*' => Yii::t('app/modules/pages', 'All languages')
+            ];
+        }
+
+        $languages = $this->getLanguages(null, false);
+        if (isset(Yii::$app->translations) && class_exists('wdmg\translations\models\Languages')) {
+            $locales = Yii::$app->translations->getLocales(false, false, true);
+            $languages = array_diff_assoc(ArrayHelper::map($locales, 'locale', 'name'), $languages);
+        } else {
+            if (is_array($this->_module->supportLocales)) {
+                $supportLanguages = [];
+                $locales = $this->_module->supportLocales;
+                foreach ($locales as $locale) {
+
+                    if (extension_loaded('intl'))
+                        $language = mb_convert_case(trim(\Locale::getDisplayLanguage($locale, Yii::$app->language)), MB_CASE_TITLE, "UTF-8");
+                    else
+                        $language = $locale;
+
+                    $supportLanguages = ArrayHelper::merge($supportLanguages, [$locale => $language]);
+                }
+
+                $languages = array_diff_assoc($supportLanguages, $languages);
+            }
+        }
+
+        $list = ArrayHelper::merge($list, $languages);
+
+        return $list;
+    }
+
 }

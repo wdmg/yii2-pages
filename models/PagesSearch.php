@@ -18,7 +18,7 @@ class PagesSearch extends Pages
     {
         return [
             [['id', 'in_sitemap', 'in_turbo', 'in_amp'], 'integer'],
-            [['name', 'alias', 'title', 'description', 'keywords', 'status'], 'safe'],
+            [['name', 'alias', 'title', 'description', 'keywords', 'status', 'locale'], 'safe'],
         ];
     }
 
@@ -54,11 +54,16 @@ class PagesSearch extends Pages
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
+        } else {
+            // query all without languages version
+            $query->where([
+                'source_id' => null,
+            ]);
         }
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'id' => $this->id,
+            'id' => $this->id
         ]);
 
         $query->andFilterWhere([
@@ -80,8 +85,18 @@ class PagesSearch extends Pages
         if ($this->in_amp !== "*")
             $query->andFilterWhere(['like', 'in_amp', $this->in_amp]);
 
+        if ($this->locale !== "*") {
+            if ($this->locale) {
+                $query->andFilterWhere(['like', 'locale', $this->locale]);
+            } else {
+                $query->andFilterWhere(['locale' => null]);
+            }
+        }
+
         if ($this->status !== "*")
             $query->andFilterWhere(['like', 'status', $this->status]);
+
+        $query->orderBy('COALESCE(`parent_id`, `id`), `parent_id` IS NOT NULL, `id`');
 
         return $dataProvider;
     }

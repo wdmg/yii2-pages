@@ -1,11 +1,11 @@
 [![Yii2](https://img.shields.io/badge/required-Yii2_v2.0.33-blue.svg)](https://packagist.org/packages/yiisoft/yii2)
-[![Github all releases](https://img.shields.io/github/downloads/wdmg/yii2-pages/total.svg)](https://GitHub.com/wdmg/yii2-pages/releases/)
+[![Downloads](https://img.shields.io/packagist/dt/wdmg/yii2-pages.svg)](https://packagist.org/packages/wdmg/yii2-pages)
+[![Packagist Version](https://img.shields.io/packagist/v/wdmg/yii2-pages.svg)](https://packagist.org/packages/wdmg/yii2-pages)
 ![Progress](https://img.shields.io/badge/progress-ready_to_use-green.svg)
 [![GitHub license](https://img.shields.io/github/license/wdmg/yii2-pages.svg)](https://github.com/wdmg/yii2-pages/blob/master/LICENSE)
-![GitHub release](https://img.shields.io/github/release/wdmg/yii2-pages/all.svg)
 
 # Yii2 Pages
-Static pages manager
+Static Page Manager
 
 # Requirements 
 * PHP 5.6 or higher
@@ -41,7 +41,8 @@ To add a module to the project, add the following data in your configuration fil
             'class' => 'wdmg\pages\Module',
             'routePrefix' => 'admin',
             'pagesRoute'  => '/pages', // route for frontend (string or array), use "/" - for root
-            'pagesLayout' => '@app/views/layouts/main' // path to default layout for render in frontend
+            'pagesLayout' => '@app/views/layouts/main', // path to default layout for render in frontend
+            'supportLocales' => ["ru-RU", "en-US", "uk-UA", "de-DE"] // list of support locales for multi-language versions
         ],
         ...
     ],
@@ -62,6 +63,7 @@ Use the `Module::dashboardNavItems()` method of the module to generate a navigat
     ?>
 
 # Status and version [ready to use]
+* v.1.2.0 - Multi-language implementation
 * v.1.1.12 - Log activity
 * v.1.1.11 - Added pagination, up to date dependencies
 * v.1.1.10 - Refactoring. Migrations bugfix

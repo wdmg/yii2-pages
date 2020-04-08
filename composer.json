@@ -4,7 +4,7 @@
   "keywords": ["yii2", "yii2-pages", "static", "pages", "wdmg"],
   "type": "yii2-extension",
   "license": "MIT",
-  "version": "1.1.12",
+  "version": "1.2.0",
   "homepage": "https://github.com/wdmg/yii2-pages",
   "support": {
     "source": "https://github.com/wdmg/yii2-pages",
@@ -36,7 +36,8 @@
     "options": {
       "routePrefix": "admin",
       "pagesRoute": "/pages",
-      "pagesLayout": "@app/views/layouts/main"
+      "pagesLayout": "@app/views/layouts/main",
+      "supportLocales": ["ru-RU", "en-US", "uk-UA", "de-DE"]
     }
   }
 }

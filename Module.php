@@ -6,7 +6,7 @@ namespace wdmg\pages;
  * Yii2 Pages
  *
  * @category        Module
- * @version         1.1.12
+ * @version         1.2.0
  * @author          Alexsander Vyshnyvetskyy <alex.vyshnyvetskyy@gmail.com>
  * @link            https://github.com/wdmg/yii2-pages
  * @copyright       Copyright (c) 2019 - 2020 W.D.M.Group, Ukraine
@@ -42,12 +42,12 @@ class Module extends BaseModule
     /**
      * @var string, the description of module
      */
-    public $description = "Static pages manager";
+    public $description = "Static Page Manager";
 
     /**
      * @var string the module version
      */
-    private $version = "1.1.12";
+    private $version = "1.2.0";
 
     /**
      * @var integer, priority of initialization
@@ -63,6 +63,12 @@ class Module extends BaseModule
      * @var string, the default layout to rendered page
      */
     public $pagesLayout = "@app/views/layouts/main";
+
+    /**
+     * @var array, the list of support locales for multi-language versions of page.
+     * @note This variable will be override if you use the `wdmg\yii2-translations` module.
+     */
+    public $supportLocales = ['ru-RU', 'en-US'];
 
     /**
      * {@inheritdoc}
@@ -130,38 +136,16 @@ class Module extends BaseModule
         if (isset(Yii::$app->params["pages.pagesRoute"]))
             $this->pagesRoute = Yii::$app->params["pages.pagesRoute"];
 
+        if (isset(Yii::$app->params["pages.supportLocales"]))
+            $this->supportLocales = Yii::$app->params["pages.supportLocales"];
+
         if (!isset($this->pagesRoute))
             throw new InvalidConfigException("Required module property `pagesRoute` isn't set.");
 
         // Add routes to pages in frontend
-        $pagesRoute = $this->pagesRoute;
-        if (empty($pagesRoute) || $pagesRoute == "/") {
-            $app->getUrlManager()->addRules([
-                [
-                    'pattern' => '/<route:[\w-\/]+>/<page:[\w-]+>',
-                    'route' => 'admin/pages/default',
-                    'suffix' => ''
-                ],
-                '/<route:[\w-\/]+>/<page:[\w-]+>' => 'admin/pages/default',
-            ], true);
-        } else if (is_string($pagesRoute)) {
-            $app->getUrlManager()->addRules([
-                [
-                    'pattern' => $pagesRoute . '/<page:[\w-]+>',
-                    'route' => 'admin/pages/default',
-                    'suffix' => ''
-                ],
-                $pagesRoute . '/<page:[\w-]+>' => 'admin/pages/default'
-            ], true);
-            $app->getUrlManager()->addRules([
-                [
-                    'pattern' => $pagesRoute . '/<route:[\w-\/]+>/<page:[\w-]+>',
-                    'route' => 'admin/pages/default',
-                    'suffix' => ''
-                ],
-                $pagesRoute . '/<route:[\w-\/]+>/<page:[\w-]+>' => 'admin/pages/default'
-            ], true);
-        }
+        $app->getUrlManager()->addRules([
+            '/<lang:\w+>/<route:[\w-\/]+>/<alias:[\w-]+>' => 'admin/pages/default/view',
+        ], true);
 
     }
 }
