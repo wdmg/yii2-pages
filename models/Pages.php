@@ -42,8 +42,14 @@ class Pages extends ActiveRecord
     const PAGE_STATUS_PUBLISHED = 1; // Page has been published
     const PAGE_SCENARIO_CREATE = 'create';
 
+    /**
+     * @var string
+     */
     public $url;
 
+    /**
+     * @var object
+     */
     private $_module;
 
     /**
@@ -117,7 +123,7 @@ class Pages extends ActiveRecord
             ['parent_id', 'checkParent'],
             ['source_id', 'checkSource'],
 
-            ['route', 'string', 'max' => 32],
+            ['route', 'string', 'max' => 255],
             ['route', 'match', 'pattern' => '/^[A-Za-z0-9\-\_\/]+$/', 'message' => Yii::t('app/modules/pages','It allowed only Latin alphabet, numbers and the «-», «_», «/» characters.')],
 
             ['locale', 'string', 'max' => 10],
@@ -128,7 +134,6 @@ class Pages extends ActiveRecord
             ['layout', 'string', 'max' => 64],
             ['layout', 'match', 'pattern' => '/^[A-Za-z0-9\-\_\/\@]+$/', 'message' => Yii::t('app/modules/pages','It allowed only Latin alphabet, numbers and the «@», «-», «_», «/» characters.')],
 
-            //['alias', 'unique', 'message' => Yii::t('app/modules/pages', 'Param attribute must be unique.')],
             ['alias', 'checkAlias'],
             ['alias', 'match', 'pattern' => '/^[A-Za-z0-9\-\_]+$/', 'message' => Yii::t('app/modules/pages','It allowed only Latin alphabet, numbers and the «-», «_» characters.')],
             [['created_at', 'updated_at'], 'safe'],
@@ -473,9 +478,9 @@ class Pages extends ActiveRecord
                     $urlManager = new \wdmg\translations\components\UrlManager($config);
                     if ($this->status == self::PAGE_STATUS_DRAFT && $realUrl) {
                         if ($absoluteUrl)
-                        return $urlManager->createAbsoluteUrl(['default/index', 'route' => $this->route, 'page' => $this->alias, 'lang' => $this->locale, 'draft' => 'true']);
-                            else
-                        return $urlManager->createUrl(['default/index', 'route' => $this->route, 'page' => $this->alias, 'lang' => $this->locale, 'draft' => 'true']);
+                            return \yii\helpers\Url::to(['default/view', 'route' => $this->route, 'alias' => $this->alias, 'draft' => 'true'], $absoluteUrl);
+                        else
+                            return \yii\helpers\Url::to(['default/view', 'route' => $this->route, 'alias' => $this->alias, 'draft' => 'true']);
                     } else {
                         if ($absoluteUrl)
                             return $urlManager->createAbsoluteUrl([$this->route . '/' . $this->alias, 'lang' => $this->locale]);
@@ -485,7 +490,7 @@ class Pages extends ActiveRecord
                 }
             } else {
                 if ($this->status == self::PAGE_STATUS_DRAFT && $realUrl) {
-                    return \yii\helpers\Url::to(['default/index', 'route' => $this->route, 'page' => $this->alias, 'draft' => 'true'], $absoluteUrl);
+                    return \yii\helpers\Url::to(['default/view', 'route' => $this->route, 'alias' => $this->alias, 'draft' => 'true'], $absoluteUrl);
                 } else {
                     return \yii\helpers\Url::to($this->route . '/' . $this->alias);
                 }
@@ -534,11 +539,13 @@ class Pages extends ActiveRecord
     /**
      * Returns published pages
      *
-     * @param null $cond sampling conditions
-     * @param bool $asArray flag if necessary to return as an array
-     * @return array|ActiveRecord|null
+     * @param null $cond
+     * @param bool $asArray
+     * @param bool $onlyOne
+     * @return array|ActiveRecord|ActiveRecord[]|null
      */
-    public function getPublished($cond = null, $asArray = false) {
+    public static function getPublished($cond = null, $asArray = false, $onlyOne = false) {
+
         if (!is_null($cond) && is_array($cond))
             $models = self::find()->where(ArrayHelper::merge($cond, ['status' => self::PAGE_STATUS_PUBLISHED]));
         elseif (!is_null($cond) && is_string($cond))
@@ -546,30 +553,45 @@ class Pages extends ActiveRecord
         else
             $models = self::find()->where(['status' => self::PAGE_STATUS_PUBLISHED]);
 
-        if ($asArray)
-            return $models->asArray()->all();
-        else
-            return $models->all();
+        if ($asArray) {
+            if ($onlyOne)
+                return $models->asArray()->one();
+            else
+                return $models->asArray()->all();
+        } else {
+            if ($onlyOne)
+                return $models->one();
+            else
+                return $models->all();
+        }
 
     }
 
     /**
      * Returns all pages (draft and published)
      *
-     * @param null $cond sampling conditions
-     * @param bool $asArray flag if necessary to return as an array
-     * @return array|ActiveRecord|null
+     * @param null $cond
+     * @param bool $asArray
+     * @param bool $onlyOne
+     * @return array|ActiveRecord|ActiveRecord[]|null
      */
-    public function getAll($cond = null, $asArray = false) {
+    public function getAll($cond = null, $asArray = false, $onlyOne = false) {
         if (!is_null($cond))
             $models = self::find()->where($cond);
         else
             $models = self::find();
 
-        if ($asArray)
-            return $models->asArray()->all();
-        else
-            return $models->all();
+        if ($asArray) {
+            if ($onlyOne)
+                return $models->asArray()->one();
+            else
+                return $models->asArray()->all();
+        } else {
+            if ($onlyOne)
+                return $models->one();
+            else
+                return $models->all();
+        }
 
     }
 
@@ -585,7 +607,6 @@ class Pages extends ActiveRecord
 
         return $this->url;
     }
-
 
     /**
      * Returns a list of all language versions of current page.
@@ -608,7 +629,7 @@ class Pages extends ActiveRecord
     }
 
     /**
-     * Returns a list of all languages used for current page.
+     * Returns a list of all languages used for pages.
      *
      * @param null $id
      * @param bool $asArray
@@ -641,6 +662,7 @@ class Pages extends ActiveRecord
                 }
             }
         }
+
         return $languages;
     }
 

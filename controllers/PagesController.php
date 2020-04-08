@@ -71,6 +71,9 @@ class PagesController extends Controller
         return $behaviors;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function beforeAction($action)
     {
         $this->_locale = Yii::$app->request->get('locale', null);
@@ -80,7 +83,8 @@ class PagesController extends Controller
 
     /**
      * Lists of all Pages models.
-     * @return mixed
+     *
+     * @return string
      */
     public function actionIndex()
     {
@@ -94,11 +98,11 @@ class PagesController extends Controller
         ]);
     }
 
-
     /**
      * Creates a new Page model.
      * If creation is successful, the browser will be redirected to the list of pages.
-     * @return mixed
+     *
+     * @return string|\yii\web\Response
      */
     public function actionCreate()
     {
@@ -154,11 +158,6 @@ class PagesController extends Controller
             }
         } else {
 
-            /*if (Yii::$app->request->isPost && !$model->validate()) {
-                var_dump($model->errors);
-                die();
-            }*/
-
             if ($model->load(Yii::$app->request->post())) {
 
                 if ($model->save()) {
@@ -203,9 +202,10 @@ class PagesController extends Controller
     /**
      * Updates an existing Page model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     *
+     * @param $id
+     * @return string|\yii\web\Response
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
@@ -247,11 +247,6 @@ class PagesController extends Controller
 
                 // Get new URL for saved page
                 $newPageUrl = $model->getPageUrl(false);
-
-                if (Yii::$app->request->isPost && !$model->validate()) {
-                    var_dump($model->errors);
-                    die();
-                }
 
                 if($model->save()) {
 
@@ -311,9 +306,10 @@ class PagesController extends Controller
 
     /**
      * Displays a single Page model.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     *
+     * @param $id
+     * @return string
+     * @throws NotFoundHttpException
      */
     public function actionView($id)
     {
@@ -327,9 +323,12 @@ class PagesController extends Controller
     /**
      * Deletes an existing Pages model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     *
+     * @param $id
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
      */
     public function actionDelete($id)
     {
@@ -386,9 +385,9 @@ class PagesController extends Controller
      * If the private variable $this->_locale contains the locale, the language version is returned.
      * If the model is not found, a 404 HTTP exception will be thrown.
      *
-     * @param integer $id
-     * @return Pages the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $id
+     * @return Pages|null
+     * @throws NotFoundHttpException
      */
     protected function findModel($id)
     {

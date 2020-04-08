@@ -2,7 +2,7 @@
 
 return [
     'Pages' => "Страницы",
-    'A static pages manager' => "Менеджер статичных страниц",
+    'Static Page Manager' => "Менеджер статичных страниц",
 
     'ID' => "ИД",
     'Name' => "Название",

@@ -28,7 +28,7 @@ class m190725_005152_pages extends Migration
             'description' => $this->string(255)->null(),
             'keywords' => $this->string(255)->null(),
             'status' => $this->tinyInteger(1)->null()->defaultValue(0),
-            'route' => $this->string(32)->null(),
+            'route' => $this->string(255)->null(),
             'layout' => $this->string(64)->null(),
             'created_at' => $this->dateTime()->defaultExpression('CURRENT_TIMESTAMP'),
             'created_by' => $this->integer(11)->notNull()->defaultValue(0),

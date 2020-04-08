@@ -32,7 +32,7 @@ if ($model->locale && isset(Yii::$app->translations) && class_exists('\wdmg\tran
                 'format' => 'raw',
                 'value' => function($model) {
                     $output = Html::tag('strong', $model->name);
-                    if (($pageURL = $model->getPageUrl(false)) && $model->id)
+                    if (($pageURL = $model->getPageUrl(true, true)) && $model->id)
                         $output .= '<br/>' . Html::a($pageURL, $pageURL, [
                                 'target' => '_blank',
                                 'data-pjax' => 0

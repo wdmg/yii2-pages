@@ -1,7 +1,8 @@
 Changelog
 =========
 
-## 1.2.*
+## 1.2.0 (2020-04-09)
+ * Refactoring Default controller, migrations bugfix
  * Method getPageUrl() refactoring
  * Fixed getPageUrl() method
  * Added `supportLocales` module properties, fixed Pages form
