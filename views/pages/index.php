@@ -269,9 +269,9 @@ if (isset(Yii::$app->translations) && class_exists('\wdmg\translations\FlagsAsse
                     'class' => 'text-center'
                 ],
                 'value' => function($data) {
-                    if ($data->status == $data::PAGE_STATUS_PUBLISHED)
+                    if ($data->status == $data::STATUS_PUBLISHED)
                         return '<span class="label label-success">'.Yii::t('app/modules/pages','Published').'</span>';
-                    elseif ($data->status == $data::PAGE_STATUS_DRAFT)
+                    elseif ($data->status == $data::STATUS_DRAFT)
                         return '<span class="label label-default">'.Yii::t('app/modules/pages','Draft').'</span>';
                     else
                         return $data->status;

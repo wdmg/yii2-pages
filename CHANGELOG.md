@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## 1.2.*
+ * Rebased to ActiveRecordML model
+ 
 ## 1.2.0 (2020-04-09)
  * Refactoring Default controller, migrations bugfix
  * Method getPageUrl() refactoring

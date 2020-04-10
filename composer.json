@@ -35,8 +35,8 @@
   "extra": {
     "options": {
       "routePrefix": "admin",
-      "pagesRoute": "/pages",
-      "pagesLayout": "@app/views/layouts/main",
+      "baseRoute": "/pages",
+      "baseLayout": "@app/views/layouts/main",
       "supportLocales": ["ru-RU", "en-US", "uk-UA", "de-DE"]
     }
   }

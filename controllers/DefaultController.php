@@ -23,7 +23,7 @@ class DefaultController extends Controller
     public function beforeAction($action)
     {
         // Set a default layout
-        $this->layout = $this->module->pagesLayout;
+        $this->layout = $this->module->baseLayout;
 
         return parent::beforeAction($action);
     }

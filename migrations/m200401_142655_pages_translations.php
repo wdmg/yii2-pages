@@ -65,12 +65,14 @@ class m200401_142655_pages_translations extends Migration
             $this->dropIndex('{{%idx-pages-locale}}', '{{%pages}}');
             $this->dropColumn('{{%pages}}', 'locale');
 
-            $langsTable = \wdmg\translations\models\Languages::tableName();
-            if (!(Yii::$app->db->getTableSchema($langsTable, true) === null)) {
-                $this->dropForeignKey(
-                    'fk_pages_to_langs',
-                    '{{%pages}}'
-                );
+            if (class_exists('\wdmg\translations\models\Languages')) {
+                $langsTable = \wdmg\translations\models\Languages::tableName();
+                if (!(Yii::$app->db->getTableSchema($langsTable, true) === null)) {
+                    $this->dropForeignKey(
+                        'fk_pages_to_langs',
+                        '{{%pages}}'
+                    );
+                }
             }
         }
     }

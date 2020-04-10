@@ -107,9 +107,9 @@ class PagesController extends Controller
     public function actionCreate()
     {
         $model = new Pages();
-        $model->scenario = $model::PAGE_SCENARIO_CREATE;
+        $model->scenario = $model::SCENARIO_CREATE;
 
-        $model->status = $model::PAGE_STATUS_DRAFT;
+        $model->status = $model::STATUS_DRAFT;
         $model->route = null;
         $model->layout = null;
 
@@ -251,7 +251,7 @@ class PagesController extends Controller
                 if($model->save()) {
 
                     // Set 301-redirect from old URL to new
-                    if (isset(Yii::$app->redirects) && ($oldPageUrl !== $newPageUrl) && ($model->status == $model::PAGE_STATUS_PUBLISHED)) {
+                    if (isset(Yii::$app->redirects) && ($oldPageUrl !== $newPageUrl) && ($model->status == $model::STATUS_PUBLISHED)) {
                         // @TODO: remove old redirects
                         Yii::$app->redirects->set('pages', $oldPageUrl, $newPageUrl, 301);
                     }

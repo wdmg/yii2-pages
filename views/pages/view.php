@@ -112,9 +112,9 @@ if ($model->locale && isset(Yii::$app->translations) && class_exists('\wdmg\tran
                 'attribute' => 'status',
                 'format' => 'html',
                 'value' => function($data) {
-                    if ($data->status == $data::PAGE_STATUS_PUBLISHED)
+                    if ($data->status == $data::STATUS_PUBLISHED)
                         return '<span class="label label-success">'.Yii::t('app/modules/pages','Published').'</span>';
-                    elseif ($data->status == $data::PAGE_STATUS_DRAFT)
+                    elseif ($data->status == $data::STATUS_DRAFT)
                         return '<span class="label label-default">'.Yii::t('app/modules/pages','Draft').'</span>';
                     else
                         return $data->status;
@@ -127,8 +127,8 @@ if ($model->locale && isset(Yii::$app->translations) && class_exists('\wdmg\tran
 
                     if (isset($data->route))
                         return Html::tag('strong', $data->route);
-                    elseif (isset($this->context->module->pagesRoute))
-                        return ((is_array($this->context->module->pagesRoute)) ? array_shift($this->context->module->pagesRoute) : $this->context->module->pagesRoute) .'&nbsp;'. Html::tag('span', Yii::t('app/modules/pages','by default'), ['class' => 'label label-default']);
+                    elseif (isset($this->context->module->baseRoute))
+                        return ((is_array($this->context->module->baseRoute)) ? array_shift($this->context->module->baseRoute) : $this->context->module->baseRoute) .'&nbsp;'. Html::tag('span', Yii::t('app/modules/pages','by default'), ['class' => 'label label-default']);
                     else
                         return null;
                 }
@@ -139,8 +139,8 @@ if ($model->locale && isset(Yii::$app->translations) && class_exists('\wdmg\tran
                 'value' => function($data) {
                     if (isset($data->layout))
                         return Html::tag('strong', $data->layout);
-                    elseif (isset($this->context->module->pagesLayout))
-                        return $this->context->module->pagesLayout .'&nbsp;'. Html::tag('span', Yii::t('app/modules/pages','by default'), ['class' => 'label label-default']);
+                    elseif (isset($this->context->module->baseLayout))
+                        return $this->context->module->baseLayout .'&nbsp;'. Html::tag('span', Yii::t('app/modules/pages','by default'), ['class' => 'label label-default']);
                     else
                         return null;
                 }

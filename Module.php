@@ -57,18 +57,18 @@ class Module extends BaseModule
     /**
      * @var string or array, the default routes to rendered page (use "/" - for root)
      */
-    public $pagesRoute = "/pages";
+    public $baseRoute = "/pages";
 
     /**
      * @var string, the default layout to rendered page
      */
-    public $pagesLayout = "@app/views/layouts/main";
+    public $baseLayout = "@app/views/layouts/main";
 
     /**
      * @var array, the list of support locales for multi-language versions of page.
      * @note This variable will be override if you use the `wdmg\yii2-translations` module.
      */
-    public $supportLocales = ['ru-RU', 'en-US'];
+    public $supportLocales = ['ru-RU', 'uk-UA', 'en-US'];
 
     /**
      * {@inheritdoc}
@@ -86,11 +86,11 @@ class Module extends BaseModule
         // Process and normalize route for pages in frontend
         $model = new \wdmg\pages\models\Pages();
         $pages = $model->getRoutes(true);
-        $this->pagesRoute = ArrayHelper::merge(
-            is_array($this->pagesRoute) ? $this->pagesRoute : [$this->pagesRoute],
+        $this->baseRoute = ArrayHelper::merge(
+            is_array($this->baseRoute) ? $this->baseRoute : [$this->baseRoute],
             array_unique(ArrayHelper::getColumn($pages, 'route'))
         );
-        $this->pagesRoute = self::normalizePagesRoute($this->pagesRoute);
+        $this->baseRoute = self::normalizePagesRoute($this->baseRoute);
     }
 
     /**
@@ -133,14 +133,14 @@ class Module extends BaseModule
     {
         parent::bootstrap($app);
 
-        if (isset(Yii::$app->params["pages.pagesRoute"]))
-            $this->pagesRoute = Yii::$app->params["pages.pagesRoute"];
+        if (isset(Yii::$app->params["pages.baseRoute"]))
+            $this->baseRoute = Yii::$app->params["pages.baseRoute"];
 
         if (isset(Yii::$app->params["pages.supportLocales"]))
             $this->supportLocales = Yii::$app->params["pages.supportLocales"];
 
-        if (!isset($this->pagesRoute))
-            throw new InvalidConfigException("Required module property `pagesRoute` isn't set.");
+        if (!isset($this->baseRoute))
+            throw new InvalidConfigException("Required module property `baseRoute` isn't set.");
 
         // Add routes to pages in frontend
         $app->getUrlManager()->addRules([
