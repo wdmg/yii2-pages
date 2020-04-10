@@ -83,14 +83,17 @@ class Module extends BaseModule
         // Set priority of current module
         $this->setPriority($this->priority);
 
-        // Process and normalize route for pages in frontend
-        $model = new \wdmg\pages\models\Pages();
-        $pages = $model->getRoutes(true);
-        $this->baseRoute = ArrayHelper::merge(
-            is_array($this->baseRoute) ? $this->baseRoute : [$this->baseRoute],
-            array_unique(ArrayHelper::getColumn($pages, 'route'))
-        );
-        $this->baseRoute = self::normalizePagesRoute($this->baseRoute);
+        if (isset(Yii::$app->params["pages.baseRoute"]))
+            $this->baseRoute = Yii::$app->params["pages.baseRoute"];
+
+        if (isset(Yii::$app->params["pages.supportLocales"]))
+            $this->supportLocales = Yii::$app->params["pages.supportLocales"];
+
+        if (!isset($this->baseRoute))
+            throw new InvalidConfigException("Required module property `baseRoute` isn't set.");
+
+        // Process and normalize route for news in frontend
+        $this->baseRoute = self::normalizeRoute($this->baseRoute);
     }
 
     /**
@@ -132,19 +135,10 @@ class Module extends BaseModule
     public function bootstrap($app)
     {
         parent::bootstrap($app);
-
-        if (isset(Yii::$app->params["pages.baseRoute"]))
-            $this->baseRoute = Yii::$app->params["pages.baseRoute"];
-
-        if (isset(Yii::$app->params["pages.supportLocales"]))
-            $this->supportLocales = Yii::$app->params["pages.supportLocales"];
-
-        if (!isset($this->baseRoute))
-            throw new InvalidConfigException("Required module property `baseRoute` isn't set.");
-
         // Add routes to pages in frontend
         $app->getUrlManager()->addRules([
-            '/<lang:\w+>/<route:[\w-\/]+>/<alias:[\w-]+>' => 'admin/pages/default/view',
+            //'/<lang:\w+>/<route:[\w-\/]+>/<alias:[\w-]+>' => 'admin/pages/default/view',
+            '/<lang:\w+>/<route:['.$this->baseRoute.'\-\/].*>/<alias:[\w-]+>' => 'admin/pages/default/view',
         ], true);
 
     }
