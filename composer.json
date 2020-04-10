@@ -37,7 +37,7 @@
       "routePrefix": "admin",
       "baseRoute": "/pages",
       "baseLayout": "@app/views/layouts/main",
-      "supportLocales": ["ru-RU", "en-US", "uk-UA", "de-DE"]
+      "supportLocales": ["ru-RU", "uk-UA", "en-US"]
     }
   }
 }

@@ -144,16 +144,26 @@ class Pages extends ActiveRecordML
 
         if ($this->id) {
             $subQuery = self::find()->select('id')->where(['parent_id' => $this->id]);
+
             $query = self::find()->alias('pages')
                 ->where(['not in', 'pages.parent_id', $subQuery])
-                ->andWhere(['!=', 'pages.parent_id', $this->id])
-                ->orWhere(['IS', 'pages.parent_id', null])
-                ->andWhere(['!=', 'pages.id', $this->id])
-                ->select(['id', 'name']);
+                ->andWhere(['!=', 'pages.id', $this->id]);
 
-            $pages = $query->asArray()->all();
+            if ($this->locale)
+                $query->andWhere(['locale' => $this->locale]);
+
+            $query->orWhere(['IS', 'pages.parent_id', null]);
+            $query->andWhere(['locale' => $this->locale]);
+
+            $pages = $query->select(['id', 'name'])->asArray()->all();
+
         } else {
-            $pages = self::find()->select(['id', 'name'])->asArray()->all();
+            $query = self::find();
+
+            if ($this->locale)
+                $query->where(['locale' => $this->locale]);
+
+            $pages = $query->select(['id', 'name'])->asArray()->all();
         }
 
         if ($allLabel)
@@ -166,6 +176,7 @@ class Pages extends ActiveRecordML
             ], ArrayHelper::map($pages, 'id', 'name'));
         else
             return ArrayHelper::map($pages, 'id', 'name');
+
     }
 
     /** ********************************************* **/

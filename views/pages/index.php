@@ -141,7 +141,7 @@ if (isset(Yii::$app->translations) && class_exists('\wdmg\translations\FlagsAsse
             ],
             [
                 'attribute' => 'locale',
-                'label' => Yii::t('app/modules/pages','Languages'),
+                'label' => Yii::t('app/modules/pages','Language versions'),
                 'format' => 'raw',
                 'filter' => false,
                 'headerOptions' => [

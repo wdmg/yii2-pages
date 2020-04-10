@@ -188,22 +188,6 @@ use wdmg\widgets\SelectInput;
         'options' => [],
         'pluginOptions' => []
     ]) ?>
-    <?= $form->field($model, 'title')->textInput() ?>
-    <?= $form->field($model, 'description')->textarea(['rows' => 3]) ?>
-    <?= $form->field($model, 'keywords')->textarea(['rows' => 3]) ?>
-
-    <?= $form->field($model, 'in_sitemap', [
-        'template' => "{label}\n<br/>{input}\n{hint}\n{error}"
-    ])->checkbox(['label' => Yii::t('app/modules/pages', '- display in the sitemap')])->label(Yii::t('app/modules/pages', 'Sitemap'))
-    ?>
-    <?= $form->field($model, 'in_turbo', [
-        'template' => "{label}\n<br/>{input}\n{hint}\n{error}"
-    ])->checkbox(['label' => Yii::t('app/modules/pages', '- display in the turbo-pages')])->label(Yii::t('app/modules/pages', 'Yandex turbo'))
-    ?>
-    <?= $form->field($model, 'in_amp', [
-        'template' => "{label}\n<br/>{input}\n{hint}\n{error}"
-    ])->checkbox(['label' => Yii::t('app/modules/pages', '- display in the AMP pages')])->label(Yii::t('app/modules/pages', 'Google AMP'))
-    ?>
 
     <?= $form->field($model, 'status')->widget(SelectInput::class, [
         'items' => $statusModes,
@@ -226,16 +210,62 @@ use wdmg\widgets\SelectInput;
         'options' => [
             'id' => 'page-form-parent',
             'class' => 'form-control',
-            'disabled' => (!is_null($model->source_id)) ? true : false
+            'disabled' => (count($parentsList) <=1 ) ? true : ((!is_null($model->source_id)) ? true : false)
         ]
     ]); ?>
 
-    <?= $form->field($model, 'route')->textInput([
-        'placeholder' => (is_null($model->route)) ? ((is_array($this->context->module->baseRoute)) ? array_shift($this->context->module->baseRoute) : $this->context->module->baseRoute) : false,
-        'disabled' => (!is_null($model->parent_id)) ? true : false
-    ]) ?>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h6 class="panel-title">
+                <a data-toggle="collapse" href="#pageMetaTags">
+                    <?= Yii::t('app/modules/pages', "Meta tags") ?>
+                </a>
+            </h6>
+        </div>
+        <div id="pageMetaTags" class="panel-collapse collapse">
+            <div class="panel-body">
+                <?= $form->field($model, 'title')->textInput() ?>
+                <?= $form->field($model, 'description')->textarea(['rows' => 3]) ?>
+                <?= $form->field($model, 'keywords')->textarea(['rows' => 3]) ?>
+            </div>
+        </div>
+    </div>
 
-    <?= $form->field($model, 'layout')->textInput(['placeholder' => (is_null($model->layout)) ? ((isset($this->context->module->baseLayout)) ? $this->context->module->baseLayout : '') : false]) ?>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h6 class="panel-title">
+                <a data-toggle="collapse" href="#pageOptions">
+                    <?= Yii::t('app/modules/pages', "Page options") ?>
+                </a>
+            </h6>
+        </div>
+        <div id="pageOptions" class="panel-collapse collapse">
+            <div class="panel-body">
+
+                <?= $form->field($model, 'in_sitemap', [
+                    'template' => "{label}\n<br/>{input}\n{hint}\n{error}"
+                ])->checkbox(['label' => Yii::t('app/modules/pages', '- display in the sitemap')])->label(Yii::t('app/modules/pages', 'Sitemap'))
+                ?>
+                <?= $form->field($model, 'in_turbo', [
+                    'template' => "{label}\n<br/>{input}\n{hint}\n{error}"
+                ])->checkbox(['label' => Yii::t('app/modules/pages', '- display in the turbo-pages')])->label(Yii::t('app/modules/pages', 'Yandex turbo'))
+                ?>
+                <?= $form->field($model, 'in_amp', [
+                    'template' => "{label}\n<br/>{input}\n{hint}\n{error}"
+                ])->checkbox(['label' => Yii::t('app/modules/pages', '- display in the AMP pages')])->label(Yii::t('app/modules/pages', 'Google AMP'))
+                ?>
+
+                <?= $form->field($model, 'route')->textInput([
+                    'placeholder' => (is_null($model->route)) ? ((is_array($this->context->module->baseRoute)) ? array_shift($this->context->module->baseRoute) : $this->context->module->baseRoute) : false,
+                    'disabled' => (!is_null($model->parent_id)) ? true : false
+                ]) ?>
+
+                <?= $form->field($model, 'layout')->textInput(['placeholder' => (is_null($model->layout)) ? ((isset($this->context->module->baseLayout)) ? $this->context->module->baseLayout : '') : false]) ?>
+
+            </div>
+        </div>
+    </div>
+
     <hr/>
     <div class="form-group">
         <?= Html::a(Yii::t('app/modules/pages', '&larr; Back to list'), ['pages/index'], ['class' => 'btn btn-default pull-left']) ?>&nbsp;

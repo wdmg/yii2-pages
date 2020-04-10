@@ -92,11 +92,16 @@ return [
     '&larr; Prev page' => '&larr; Предыдущая страница',
     'Next page &rarr;' => 'Следующая страница &rarr;',
 
-    'Locale' => 'Языковая локаль',
+    'Meta tags' => 'Мета-теги',
+    'Page options' => 'Опции страницы',
+
+    'Locale' => 'Локаль',
     'Source ID' => 'ИД исходника',
     'Language' => 'Язык',
     'Languages' => 'Языки',
+    'Language locale' => 'Языковая локаль',
     'Language version' => 'Языковая версия',
+    'Language versions' => 'Языковые версии',
     'All languages' => 'Все языки',
     'Not selected' => 'Не выбран',
     'It looks like the same language version of page or child page already exists.' => 'Похоже, что такая же языковая версия или дочерняя страница уже существует.',
