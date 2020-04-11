@@ -2,6 +2,7 @@ Changelog
 =========
 
 ## 1.2.*
+ * LangSwitcher::widget() for model form
  * Rebased to ActiveRecordML model
  
 ## 1.2.0 (2020-04-09)

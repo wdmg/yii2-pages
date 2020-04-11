@@ -116,8 +116,10 @@ class PagesController extends Controller
         // No language is set for this model, we will use the current user language
         if (is_null($model->locale)) {
             if (is_null($this->_locale)) {
+
                 $model->locale = Yii::$app->language;
                 if (!Yii::$app->request->isPost) {
+
                     $languages = $model->getLanguagesList(false);
                     Yii::$app->getSession()->setFlash(
                         'danger',
@@ -213,8 +215,10 @@ class PagesController extends Controller
 
         // No language is set for this model, we will use the current user language
         if (is_null($model->locale)) {
+
             $model->locale = Yii::$app->language;
             if (!Yii::$app->request->isPost) {
+
                 $languages = $model->getLanguagesList(false);
                 Yii::$app->getSession()->setFlash(
                     'danger',
