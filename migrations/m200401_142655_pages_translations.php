@@ -12,6 +12,10 @@ class m200401_142655_pages_translations extends Migration
      */
     public function safeUp()
     {
+        $defaultLocale = null;
+        if (isset(Yii::$app->sourceLanguage))
+            $defaultLocale = Yii::$app->sourceLanguage;
+
         if (is_null($this->getDb()->getSchema()->getTableSchema('{{%pages}}')->getColumn('source_id'))) {
             $this->addColumn('{{%pages}}', 'source_id', $this->integer(11)->null()->after('parent_id'));
 
@@ -29,7 +33,7 @@ class m200401_142655_pages_translations extends Migration
 
         }
         if (is_null($this->getDb()->getSchema()->getTableSchema('{{%pages}}')->getColumn('locale'))) {
-            $this->addColumn('{{%pages}}', 'locale', $this->string(10)->after('status'));
+            $this->addColumn('{{%pages}}', 'locale', $this->string(10)->defaultValue($defaultLocale)->after('status'));
             $this->createIndex('{{%idx-pages-locale}}', '{{%pages}}', ['locale']);
 
             // If module `Translations` exist setup foreign key `locale` to `trans_langs.locale`

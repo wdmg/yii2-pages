@@ -47,21 +47,13 @@ use wdmg\widgets\LangSwitcher;
         'pluginOptions' => []
     ]) ?>
 
-    <?= $form->field($model, 'status')->widget(SelectInput::class, [
-        'items' => $statusModes,
-        'options' => [
-            'id' => 'page-form-status',
-            'class' => 'form-control'
-        ]
-    ]); ?>
-
     <?= $form->field($model, 'locale')->widget(SelectInput::class, [
         'items' => $languagesList,
         'options' => [
             'id' => 'page-form-locale',
             'class' => 'form-control'
         ]
-    ]); ?>
+    ])->label(Yii::t('app/modules/pages', 'Language')); ?>
 
     <?= $form->field($model, 'parent_id')->widget(SelectInput::class, [
         'items' => $parentsList,
@@ -69,6 +61,14 @@ use wdmg\widgets\LangSwitcher;
             'id' => 'page-form-parent',
             'class' => 'form-control',
             'disabled' => (count($parentsList) <=1 ) ? true : ((!is_null($model->source_id)) ? true : false)
+        ]
+    ]); ?>
+
+    <?= $form->field($model, 'status')->widget(SelectInput::class, [
+        'items' => $statusModes,
+        'options' => [
+            'id' => 'page-form-status',
+            'class' => 'form-control'
         ]
     ]); ?>
 
