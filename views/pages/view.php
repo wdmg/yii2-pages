@@ -32,12 +32,12 @@ if ($model->locale && isset(Yii::$app->translations) && class_exists('\wdmg\tran
                 'format' => 'raw',
                 'value' => function($model) {
                     $output = Html::tag('strong', $model->name);
-                    if (($pageURL = $model->getPageUrl(true, true)) && $model->id)
-                        $output .= '<br/>' . Html::a($pageURL, $pageURL, [
+                    if (($pageURL = $model->getUrl(true, true)) && $model->id) {
+                        $output .= '<br/>' . Html::a($model->getUrl(true, false), $pageURL, [
                                 'target' => '_blank',
                                 'data-pjax' => 0
                             ]);
-
+                    }
                     return $output;
                 }
             ],
@@ -197,6 +197,13 @@ if ($model->locale && isset(Yii::$app->translations) && class_exists('\wdmg\tran
     <hr/>
     <div class="form-group">
         <?= Html::a(Yii::t('app/modules/pages', '&larr; Back to list'), ['pages/index'], ['class' => 'btn btn-default pull-left']) ?>&nbsp;
-        <?= Html::a(Yii::t('app/modules/pages', 'Update'), ['pages/update', 'id' => $model->id], ['class' => 'btn btn-primary pull-right']) ?>
+        <div class="form-group pull-right">
+            <?= Html::a(Yii::t('app/modules/pages', 'Delete'), ['pages/delete', 'id' => $model->id], [
+                'class' => 'btn btn-delete btn-danger',
+                'data-confirm' => Yii::t('app/modules/pages', 'Are you sure you want to delete this page?'),
+                'data-method' => 'post',
+            ]) ?>
+            <?= Html::a(Yii::t('app/modules/pages', 'Update'), ['pages/update', 'id' => $model->id], ['class' => 'btn btn-edit btn-primary']) ?>
+        </div>
     </div>
 </div>

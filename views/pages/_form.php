@@ -35,11 +35,17 @@ use wdmg\widgets\LangSwitcher;
     ]); ?>
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
     <?php
-        if (($pageURL = $model->getPageUrl()) && $model->id)
-            echo  Html::tag('label', Yii::t('app/modules/pages', 'Page URL')) . Html::tag('fieldset', Html::a($pageURL, $pageURL, [
+        $output = '';
+        if (($pageURL = $model->getUrl(true, true)) && $model->id) {
+            $output = Html::a($model->getUrl(true, false), $pageURL, [
                 'target' => '_blank',
                 'data-pjax' => 0
-            ])) . '<br/>';
+            ]);
+        }
+
+        if (!empty($output))
+            echo Html::tag('label', Yii::t('app/modules/pages', 'Page URL')) . Html::tag('fieldset', $output) . '<br/>';
+
     ?>
     <?= $form->field($model, 'alias')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'content')->widget(Editor::class, [
@@ -76,7 +82,7 @@ use wdmg\widgets\LangSwitcher;
         <div class="panel-heading">
             <h6 class="panel-title">
                 <a data-toggle="collapse" href="#pageMetaTags">
-                    <?= Yii::t('app/modules/pages', "Meta tags") ?>
+                    <?= Yii::t('app/modules/pages', "SEO") ?>
                 </a>
             </h6>
         </div>
@@ -93,7 +99,7 @@ use wdmg\widgets\LangSwitcher;
         <div class="panel-heading">
             <h6 class="panel-title">
                 <a data-toggle="collapse" href="#pageOptions">
-                    <?= Yii::t('app/modules/pages', "Page options") ?>
+                    <?= Yii::t('app/modules/pages', "Other options") ?>
                 </a>
             </h6>
         </div>

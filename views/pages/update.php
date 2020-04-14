@@ -6,8 +6,8 @@ use yii\helpers\Html;
 $this->title = Yii::t('app/modules/pages', 'Updating page: {name}', [
     'name' => $model->name,
 ]);
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app/modules/pages', 'All pages'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = Yii::t('app/modules/pages', 'Edit');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app/modules/pages', 'All pages'), 'url' => ['pages/index']];
+$this->params['breadcrumbs'][] = Yii::t('app/modules/pages', 'Updating');
 
 $flag = '';
 if ($model->locale && isset(Yii::$app->translations) && class_exists('\wdmg\translations\FlagsAsset')) {

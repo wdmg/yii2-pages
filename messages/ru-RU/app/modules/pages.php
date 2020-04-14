@@ -25,6 +25,7 @@ return [
     'Page URL' => "URL страницы",
     'View page' => "Просмотр страницы",
     'All pages' => "Все страницы",
+    'Updating' => "Редактирование",
     'Updating page: {name}' => "Редактирование страницы: {name}",
     'Update' => "Редактировать",
     'Actions' => "Действия",
@@ -92,8 +93,8 @@ return [
     '&larr; Prev page' => '&larr; Предыдущая страница',
     'Next page &rarr;' => 'Следующая страница &rarr;',
 
-    'Meta tags' => 'Мета-теги',
-    'Page options' => 'Опции страницы',
+    'SEO' => 'SEO',
+    'Other options' => 'Другие опции',
 
     'Locale' => 'Локаль',
     'Source ID' => 'ИД исходника',
@@ -109,7 +110,6 @@ return [
     'A language version with the selected language already exists.' => 'Языковая версия с выбранным языком уже существует.',
     'No display language has been set for this page. When saving, the current user language will be selected: {language}' => 'Для данной страницы не задан язык отображения. При сохранении будет выбран текущий язык пользователя: {language}',
     'View' => "Просмотр",
-    'Edit' => "Изменить",
     'Delete' => "Удалить",
     'Source version: {language}' => "Исходная версия: {language}",
     'Edit source version: {language}' => "Изменить исходную версию: {language}",

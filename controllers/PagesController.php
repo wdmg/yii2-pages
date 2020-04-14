@@ -40,8 +40,6 @@ class PagesController extends Controller
                     'delete' => ['post'],
                     'create' => ['get', 'post'],
                     'update' => ['get', 'post'],
-                    'export' => ['get'],
-                    'import' => ['post'],
                 ],
             ],
             'access' => [
@@ -407,6 +405,8 @@ class PagesController extends Controller
     }
 
     /**
+     * Return current locale for dashboard
+     *
      * @return string|null
      */
     public function getLocale() {
@@ -414,6 +414,8 @@ class PagesController extends Controller
     }
 
     /**
+     * Return current Source ID for dashboard
+     *
      * @return string|null
      */
     public function getSourceId() {
