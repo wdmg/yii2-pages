@@ -40,8 +40,6 @@ class PagesController extends Controller
                     'delete' => ['post'],
                     'create' => ['get', 'post'],
                     'update' => ['get', 'post'],
-                    'export' => ['get'],
-                    'import' => ['post'],
                 ],
             ],
             'access' => [
@@ -107,17 +105,19 @@ class PagesController extends Controller
     public function actionCreate()
     {
         $model = new Pages();
-        $model->scenario = $model::PAGE_SCENARIO_CREATE;
+        $model->scenario = $model::SCENARIO_CREATE;
 
-        $model->status = $model::PAGE_STATUS_DRAFT;
+        $model->status = $model::STATUS_DRAFT;
         $model->route = null;
         $model->layout = null;
 
         // No language is set for this model, we will use the current user language
         if (is_null($model->locale)) {
             if (is_null($this->_locale)) {
+
                 $model->locale = Yii::$app->language;
                 if (!Yii::$app->request->isPost) {
+
                     $languages = $model->getLanguagesList(false);
                     Yii::$app->getSession()->setFlash(
                         'danger',
@@ -213,8 +213,10 @@ class PagesController extends Controller
 
         // No language is set for this model, we will use the current user language
         if (is_null($model->locale)) {
+
             $model->locale = Yii::$app->language;
             if (!Yii::$app->request->isPost) {
+
                 $languages = $model->getLanguagesList(false);
                 Yii::$app->getSession()->setFlash(
                     'danger',
@@ -251,7 +253,7 @@ class PagesController extends Controller
                 if($model->save()) {
 
                     // Set 301-redirect from old URL to new
-                    if (isset(Yii::$app->redirects) && ($oldPageUrl !== $newPageUrl) && ($model->status == $model::PAGE_STATUS_PUBLISHED)) {
+                    if (isset(Yii::$app->redirects) && ($oldPageUrl !== $newPageUrl) && ($model->status == $model::STATUS_PUBLISHED)) {
                         // @TODO: remove old redirects
                         Yii::$app->redirects->set('pages', $oldPageUrl, $newPageUrl, 301);
                     }
@@ -403,6 +405,8 @@ class PagesController extends Controller
     }
 
     /**
+     * Return current locale for dashboard
+     *
      * @return string|null
      */
     public function getLocale() {
@@ -410,6 +414,8 @@ class PagesController extends Controller
     }
 
     /**
+     * Return current Source ID for dashboard
+     *
      * @return string|null
      */
     public function getSourceId() {

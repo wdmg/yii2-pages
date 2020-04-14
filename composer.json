@@ -4,7 +4,7 @@
   "keywords": ["yii2", "yii2-pages", "static", "pages", "wdmg"],
   "type": "yii2-extension",
   "license": "MIT",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "homepage": "https://github.com/wdmg/yii2-pages",
   "support": {
     "source": "https://github.com/wdmg/yii2-pages",
@@ -24,7 +24,8 @@
     "yiisoft/yii2": "^2.0.33",
     "wdmg/yii2-base": "^1.1.8",
     "wdmg/yii2-selectinput": "^1.0.7",
-    "wdmg/yii2-editor": "^1.0.7"
+    "wdmg/yii2-editor": "^1.0.7",
+    "wdmg/yii2-widgets": "^1.0.2"
   },
   "minimum-stability": "dev",
   "autoload": {
@@ -35,9 +36,9 @@
   "extra": {
     "options": {
       "routePrefix": "admin",
-      "pagesRoute": "/pages",
-      "pagesLayout": "@app/views/layouts/main",
-      "supportLocales": ["ru-RU", "en-US", "uk-UA", "de-DE"]
+      "baseRoute": "/pages",
+      "baseLayout": "@app/views/layouts/main",
+      "supportLocales": ["ru-RU", "uk-UA", "en-US"]
     }
   }
 }

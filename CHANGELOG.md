@@ -1,6 +1,11 @@
 Changelog
 =========
 
+## 1.2.1 (2020-04-14)
+ * Controllers and Views
+ * LangSwitcher::widget() for model form
+ * Rebased to ActiveRecordML model
+ 
 ## 1.2.0 (2020-04-09)
  * Refactoring Default controller, migrations bugfix
  * Method getPageUrl() refactoring

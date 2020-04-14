@@ -40,9 +40,9 @@ To add a module to the project, add the following data in your configuration fil
         'pages' => [
             'class' => 'wdmg\pages\Module',
             'routePrefix' => 'admin',
-            'pagesRoute'  => '/pages', // route for frontend (string or array), use "/" - for root
-            'pagesLayout' => '@app/views/layouts/main', // path to default layout for render in frontend
-            'supportLocales' => ["ru-RU", "en-US", "uk-UA", "de-DE"] // list of support locales for multi-language versions
+            'baseRoute'  => '/pages', // route for frontend (string or array), use "/" - for root
+            'baseLayout' => '@app/views/layouts/main', // path to default layout for render in frontend
+            'supportLocales' => ['ru-RU', 'uk-UA', 'en-US'] // list of support locales for multi-language versions
         ],
         ...
     ],

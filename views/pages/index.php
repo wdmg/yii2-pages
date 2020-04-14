@@ -9,7 +9,7 @@ use wdmg\widgets\SelectInput;
 
 /* @var $this yii\web\View */
 
-$this->title = $this->context->module->name;
+$this->title = Yii::t('app/modules/pages', 'All pages');
 $this->params['breadcrumbs'][] = $this->title;
 
 if (isset(Yii::$app->translations) && class_exists('\wdmg\translations\FlagsAsset')) {
@@ -45,11 +45,11 @@ if (isset(Yii::$app->translations) && class_exists('\wdmg\translations\FlagsAsse
                         $output = Html::tag('strong', $model->name);
                     }
 
-                    if (($pageURL = $model->getPageUrl(true, true)) && $model->id)
-                        $output .= '<br/>' . Html::a($pageURL, $pageURL, [
-                            'target' => '_blank',
-                            'data-pjax' => 0
-                        ]);
+                    if (($pageURL = $model->getUrl(true, true)) && $model->id)
+                        $output .= '<br/>' . Html::a($model->getUrl(true, false), $pageURL, [
+                                'target' => '_blank',
+                                'data-pjax' => 0
+                            ]);;
 
                     return $output;
                 }
@@ -88,7 +88,7 @@ if (isset(Yii::$app->translations) && class_exists('\wdmg\translations\FlagsAsse
                     return $output;
                 }
             ],
-            [
+            /*[
                 'attribute' => 'keywords',
                 'format' => 'raw',
                 'value' => function($model) {
@@ -104,7 +104,7 @@ if (isset(Yii::$app->translations) && class_exists('\wdmg\translations\FlagsAsse
 
                     return $output;
                 }
-            ],
+            ],*/
             [
                 'attribute' => 'common',
                 'label' => Yii::t('app/modules/pages','Common'),
@@ -141,7 +141,7 @@ if (isset(Yii::$app->translations) && class_exists('\wdmg\translations\FlagsAsse
             ],
             [
                 'attribute' => 'locale',
-                'label' => Yii::t('app/modules/pages','Languages'),
+                'label' => Yii::t('app/modules/pages','Language versions'),
                 'format' => 'raw',
                 'filter' => false,
                 'headerOptions' => [
@@ -269,9 +269,9 @@ if (isset(Yii::$app->translations) && class_exists('\wdmg\translations\FlagsAsse
                     'class' => 'text-center'
                 ],
                 'value' => function($data) {
-                    if ($data->status == $data::PAGE_STATUS_PUBLISHED)
+                    if ($data->status == $data::STATUS_PUBLISHED)
                         return '<span class="label label-success">'.Yii::t('app/modules/pages','Published').'</span>';
-                    elseif ($data->status == $data::PAGE_STATUS_DRAFT)
+                    elseif ($data->status == $data::STATUS_DRAFT)
                         return '<span class="label label-default">'.Yii::t('app/modules/pages','Draft').'</span>';
                     else
                         return $data->status;
@@ -545,7 +545,7 @@ if (isset(Yii::$app->translations) && class_exists('\wdmg\translations\FlagsAsse
     ]); ?>
     <hr/>
     <div>
-        <?= Html::a(Yii::t('app/modules/pages', 'Add new page'), ['pages/create'], ['class' => 'btn btn-success pull-right']) ?>
+        <?= Html::a(Yii::t('app/modules/pages', 'Add new page'), ['pages/create'], ['class' => 'btn btn-add btn-success pull-right']) ?>
     </div>
     <?php Pjax::end(); ?>
 </div>

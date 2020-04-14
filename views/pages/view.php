@@ -32,12 +32,12 @@ if ($model->locale && isset(Yii::$app->translations) && class_exists('\wdmg\tran
                 'format' => 'raw',
                 'value' => function($model) {
                     $output = Html::tag('strong', $model->name);
-                    if (($pageURL = $model->getPageUrl(true, true)) && $model->id)
-                        $output .= '<br/>' . Html::a($pageURL, $pageURL, [
+                    if (($pageURL = $model->getUrl(true, true)) && $model->id) {
+                        $output .= '<br/>' . Html::a($model->getUrl(true, false), $pageURL, [
                                 'target' => '_blank',
                                 'data-pjax' => 0
                             ]);
-
+                    }
                     return $output;
                 }
             ],
@@ -112,9 +112,9 @@ if ($model->locale && isset(Yii::$app->translations) && class_exists('\wdmg\tran
                 'attribute' => 'status',
                 'format' => 'html',
                 'value' => function($data) {
-                    if ($data->status == $data::PAGE_STATUS_PUBLISHED)
+                    if ($data->status == $data::STATUS_PUBLISHED)
                         return '<span class="label label-success">'.Yii::t('app/modules/pages','Published').'</span>';
-                    elseif ($data->status == $data::PAGE_STATUS_DRAFT)
+                    elseif ($data->status == $data::STATUS_DRAFT)
                         return '<span class="label label-default">'.Yii::t('app/modules/pages','Draft').'</span>';
                     else
                         return $data->status;
@@ -127,8 +127,8 @@ if ($model->locale && isset(Yii::$app->translations) && class_exists('\wdmg\tran
 
                     if (isset($data->route))
                         return Html::tag('strong', $data->route);
-                    elseif (isset($this->context->module->pagesRoute))
-                        return ((is_array($this->context->module->pagesRoute)) ? array_shift($this->context->module->pagesRoute) : $this->context->module->pagesRoute) .'&nbsp;'. Html::tag('span', Yii::t('app/modules/pages','by default'), ['class' => 'label label-default']);
+                    elseif (isset($this->context->module->baseRoute))
+                        return ((is_array($this->context->module->baseRoute)) ? array_shift($this->context->module->baseRoute) : $this->context->module->baseRoute) .'&nbsp;'. Html::tag('span', Yii::t('app/modules/pages','by default'), ['class' => 'label label-default']);
                     else
                         return null;
                 }
@@ -139,8 +139,8 @@ if ($model->locale && isset(Yii::$app->translations) && class_exists('\wdmg\tran
                 'value' => function($data) {
                     if (isset($data->layout))
                         return Html::tag('strong', $data->layout);
-                    elseif (isset($this->context->module->pagesLayout))
-                        return $this->context->module->pagesLayout .'&nbsp;'. Html::tag('span', Yii::t('app/modules/pages','by default'), ['class' => 'label label-default']);
+                    elseif (isset($this->context->module->baseLayout))
+                        return $this->context->module->baseLayout .'&nbsp;'. Html::tag('span', Yii::t('app/modules/pages','by default'), ['class' => 'label label-default']);
                     else
                         return null;
                 }
@@ -197,6 +197,13 @@ if ($model->locale && isset(Yii::$app->translations) && class_exists('\wdmg\tran
     <hr/>
     <div class="form-group">
         <?= Html::a(Yii::t('app/modules/pages', '&larr; Back to list'), ['pages/index'], ['class' => 'btn btn-default pull-left']) ?>&nbsp;
-        <?= Html::a(Yii::t('app/modules/pages', 'Update'), ['pages/update', 'id' => $model->id], ['class' => 'btn btn-primary pull-right']) ?>
+        <div class="form-group pull-right">
+            <?= Html::a(Yii::t('app/modules/pages', 'Delete'), ['pages/delete', 'id' => $model->id], [
+                'class' => 'btn btn-delete btn-danger',
+                'data-confirm' => Yii::t('app/modules/pages', 'Are you sure you want to delete this page?'),
+                'data-method' => 'post',
+            ]) ?>
+            <?= Html::a(Yii::t('app/modules/pages', 'Update'), ['pages/update', 'id' => $model->id], ['class' => 'btn btn-edit btn-primary']) ?>
+        </div>
     </div>
 </div>

@@ -4,7 +4,6 @@ namespace wdmg\pages\controllers;
 
 use Yii;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use wdmg\pages\models\Pages;
@@ -23,7 +22,7 @@ class DefaultController extends Controller
     public function beforeAction($action)
     {
         // Set a default layout
-        $this->layout = $this->module->pagesLayout;
+        $this->layout = $this->module->baseLayout;
 
         return parent::beforeAction($action);
     }
@@ -134,17 +133,17 @@ class DefaultController extends Controller
                 'alias' => $alias,
                 'route' => $route,
                 'locale' => ($locale) ? $locale : null,
-                'status' => 1,
+                'status' => Pages::STATUS_PUBLISHED,
             ];
         } else {
             $cond = [
                 'alias' => $alias,
                 'route' => $route,
-                'status' => 0,
+                'status' => Pages::STATUS_DRAFT,
             ];
         }
 
-        if (($model = Pages::getPublished($cond, false, true)) !== null) {
+        if (($model = Pages::findOne($cond)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException(Yii::t('app/modules/pages', 'The requested page does not exist.'));
