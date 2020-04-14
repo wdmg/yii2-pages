@@ -35,11 +35,10 @@ class Pages extends ActiveRecordML
     const STATUS_DRAFT = 0; // Page has draft
     const STATUS_PUBLISHED = 1; // Page has been published
 
-    /**
-     * Instance of \wdmg\pages\Module
-     *
-     * @var object
-     */
+    //public $url;
+    public $baseRoute;
+
+    public $moduleId = 'pages';
     private $_module;
 
     /**
@@ -48,9 +47,6 @@ class Pages extends ActiveRecordML
     public function init()
     {
         parent::init();
-
-        if (!($this->_module = Yii::$app->getModule('admin/pages', false)))
-            $this->_module = Yii::$app->getModule('pages', false);
 
         if (isset(Yii::$app->params["pages.baseRoute"]))
             $this->baseRoute = Yii::$app->params["pages.baseRoute"];
@@ -112,6 +108,18 @@ class Pages extends ActiveRecordML
             'updated_at' => Yii::t('app/modules/pages', 'Updated at'),
             'updated_by' => Yii::t('app/modules/pages', 'Updated by'),
         ], parent::attributeLabels());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function afterFind()
+    {
+        parent::afterFind();
+
+        if (is_null($this->url))
+            $this->url = $this->getUrl();
+
     }
 
     /**
@@ -178,8 +186,6 @@ class Pages extends ActiveRecordML
             return ArrayHelper::map($pages, 'id', 'name');
 
     }
-
-    /** ********************************************* **/
 
     /**
      * Returns the URL to the view of the current

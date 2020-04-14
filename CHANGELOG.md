@@ -2,6 +2,7 @@ Changelog
 =========
 
 ## 1.2.1 (2020-04-14)
+ * Fixed baseRoute
  * Controllers and Views
  * LangSwitcher::widget() for model form
  * Rebased to ActiveRecordML model
