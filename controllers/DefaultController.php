@@ -14,7 +14,11 @@ use wdmg\pages\models\Pages;
 class DefaultController extends Controller
 {
 
-    public $defaultAction = 'view';
+    /**
+     * Default language locale
+     * @var string|null
+     */
+    private $_lang;
 
     /**
      * {@inheritdoc}
@@ -23,6 +27,14 @@ class DefaultController extends Controller
     {
         // Set a default layout
         $this->layout = $this->module->baseLayout;
+
+        // Sets the default language locale
+        $this->_lang = Yii::$app->sourceLanguage;
+        if (isset(Yii::$app->translations)) {
+            if (Yii::$app->translations->module->hideDefaultLang) {
+                $this->_lang = Yii::$app->translations->getDefaultLang();
+            }
+        }
 
         return parent::beforeAction($action);
     }
@@ -50,6 +62,10 @@ class DefaultController extends Controller
             if (Yii::$app->redirects->check(Yii::$app->request->getUrl()))
                 return Yii::$app->redirects->check(Yii::$app->request->getUrl());
         }
+
+        // If the language is not transmitted, a resource with the default language may be requested
+        if (is_null($lang) && !is_null($this->_lang))
+            $lang = $this->_lang;
 
         // Separate route from request URL
         if (is_null($route) && preg_match('/^([\/]+[A-Za-z0-9_\-\_\/]+[\/])*([A-Za-z0-9_\-\_]*)/i', Yii::$app->request->url, $matches)) {

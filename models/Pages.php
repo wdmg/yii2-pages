@@ -48,6 +48,8 @@ class Pages extends ActiveRecordML
     {
         parent::init();
 
+        $this->_module = self::getModule(true);
+
         if (isset(Yii::$app->params["pages.baseRoute"]))
             $this->baseRoute = Yii::$app->params["pages.baseRoute"];
         elseif (isset($this->_module->baseRoute))

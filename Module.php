@@ -14,6 +14,7 @@ namespace wdmg\pages;
  *
  */
 
+use wdmg\translations\components\UrlManager;
 use Yii;
 use wdmg\base\BaseModule;
 use yii\base\InvalidConfigException;
@@ -94,6 +95,7 @@ class Module extends BaseModule
 
         // Process and normalize route for news in frontend
         $this->baseRoute = self::normalizeRoute($this->baseRoute);
+
     }
 
     /**
@@ -106,7 +108,7 @@ class Module extends BaseModule
     {
         if (is_array($routes)) {
             $routes = array_unique($routes);
-            foreach ($routes as $route) {
+            foreach ($routes as &$route) {
                 $route = self::normalizeRoute($route);
             }
         } else {
@@ -135,11 +137,77 @@ class Module extends BaseModule
     public function bootstrap($app)
     {
         parent::bootstrap($app);
-        // Add routes to pages in frontend
-        $app->getUrlManager()->addRules([
-            //'/<lang:\w+>/<route:[\w-\/]+>/<alias:[\w-]+>' => 'admin/pages/default/view',
-            '/<lang:\w+>/<route:['.$this->baseRoute.'\-\/].*>/<alias:[\w-]+>' => 'admin/pages/default/view',
-        ], true);
 
+        if (!$this->isBackend()) {
+
+            // Get language scheme if available
+            $custom = false;
+            $hide = false;
+            $scheme = null;
+            if (isset(Yii::$app->translations)) {
+                $custom = true;
+                $hide = Yii::$app->translations->module->hideDefaultLang;
+                $scheme = Yii::$app->translations->module->languageScheme;
+            }
+
+            $baseRoute = ltrim($this->baseRoute, '/');
+
+            // Add routes for frontend
+            switch ($scheme) {
+                case "after":
+
+                    $app->getUrlManager()->addRules([
+                        '/<route:' . $baseRoute . '.*?>/<alias:[\w-]+>/<lang:\w+>' => 'admin/pages/default/view',
+                    ], true);
+
+                    if ($hide) {
+                        $app->getUrlManager()->addRules([
+                            '/<route:' . $baseRoute . '.*?>/<alias:[\w-]+>' => 'admin/pages/default/view',
+                        ], true);
+                    }
+
+                    break;
+
+                case "query":
+
+                    $app->getUrlManager()->addRules([
+                        '/<route:' . $baseRoute . '.*?>/<alias:[\w-]+>' => 'admin/pages/default/view',
+                    ], true);
+
+                    /*if ($hide) {
+
+                    }*/
+
+                    break;
+
+                case "subdomain":
+
+                    if ($host = $app->getRequest()->getHostName()) {
+                        $app->getUrlManager()->addRules([
+                            'http(s)?://' . $host. '/<route:' . $baseRoute . '.*?>/<alias:[\w-]+>' => 'admin/pages/default/view',
+                        ], true);
+                    }
+
+                    /*if ($hide) {
+
+                    }*/
+
+                    break;
+
+                default:
+
+                    $app->getUrlManager()->addRules([
+                        '/<lang:\w+>/<route:' . $baseRoute . '.*?>/<alias:[\w-]+>' => 'admin/pages/default/view',
+                    ], true);
+
+                    if ($hide || !$custom) {
+                        $app->getUrlManager()->addRules([
+                            '/<route:' . $baseRoute . '.*?>/<alias:[\w-]+>' => 'admin/pages/default/view',
+                        ], true);
+                    }
+
+                    break;
+            }
+        }
     }
 }
