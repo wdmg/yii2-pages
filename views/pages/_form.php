@@ -151,6 +151,7 @@ use wdmg\widgets\LangSwitcher;
                 ).done(function(data) {
                     if (data.alias && form.find('#pages-alias').val().length == 0) {
                         form.find('#pages-alias').val(data.alias);
+                        form.find('#pages-alias').change();
                         form.yiiActiveForm('validateAttribute', 'pages-alias');
                     }
                 }).fail(function () {
