@@ -63,6 +63,8 @@ Use the `Module::dashboardNavItems()` method of the module to generate a navigat
     ?>
 
 # Status and version [ready to use]
+* v.1.2.2 - Added AliasInput::widget()
+* v.1.2.1 - Rebased to ActiveRecordML model
 * v.1.2.0 - Multi-language implementation
 * v.1.1.12 - Log activity
 * v.1.1.11 - Added pagination, up to date dependencies

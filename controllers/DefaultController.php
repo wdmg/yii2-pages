@@ -140,7 +140,7 @@ class DefaultController extends Controller
 
         // Throw an exception if a page with a language locale was requested,
         // which is unavailable or disabled for display in the frontend
-        if (!is_null($lang) && is_null($locale)) {
+        if ((!$draft) && !is_null($lang) && is_null($locale)) {
             throw new NotFoundHttpException(Yii::t('app/modules/pages', 'The requested page does not exist.'));
         }
 
