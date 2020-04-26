@@ -115,7 +115,7 @@ class PagesController extends Controller
         if (is_null($model->locale)) {
             if (is_null($this->_locale)) {
 
-                $model->locale = Yii::$app->language;
+                $model->locale = Yii::$app->sourceLanguage;
                 if (!Yii::$app->request->isPost) {
 
                     $languages = $model->getLanguagesList(false);
@@ -125,7 +125,7 @@ class PagesController extends Controller
                             'app/modules/pages',
                             'No display language has been set for this page. When saving, the current user language will be selected: {language}',
                             [
-                                'language' => (isset($languages[Yii::$app->language])) ? $languages[Yii::$app->language] : Yii::$app->language
+                                'language' => (isset($languages[Yii::$app->sourceLanguage])) ? $languages[Yii::$app->sourceLanguage] : Yii::$app->sourceLanguage
                             ]
                         )
                     );
@@ -214,7 +214,7 @@ class PagesController extends Controller
         // No language is set for this model, we will use the current user language
         if (is_null($model->locale)) {
 
-            $model->locale = Yii::$app->language;
+            $model->locale = Yii::$app->sourceLanguage;
             if (!Yii::$app->request->isPost) {
 
                 $languages = $model->getLanguagesList(false);
@@ -224,7 +224,7 @@ class PagesController extends Controller
                         'app/modules/pages',
                         'No display language has been set for this page. When saving, the current user language will be selected: {language}',
                         [
-                            'language' => (isset($languages[Yii::$app->language])) ? $languages[Yii::$app->language] : Yii::$app->language
+                            'language' => (isset($languages[Yii::$app->sourceLanguage])) ? $languages[Yii::$app->sourceLanguage] : Yii::$app->sourceLanguage
                         ]
                     )
                 );
