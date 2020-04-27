@@ -108,7 +108,7 @@ return [
     'It looks like the same language version of page or child page already exists.' => 'Похоже, что такая же языковая версия или дочерняя страница уже существует.',
     'The language version must refer to the main version.' => 'Языковая версия должна ссылаться на основную версию.',
     'A language version with the selected language already exists.' => 'Языковая версия с выбранным языком уже существует.',
-    'No display language has been set for this page. When saving, the current user language will be selected: {language}' => 'Для данной страницы не задан язык отображения. При сохранении будет выбран текущий язык пользователя: {language}',
+    'No display language has been set. Source language will be selected: {language}' => 'Не задан язык отображения. Будет выбран исходный язык: {language}',
     'View' => "Просмотр",
     'Delete' => "Удалить",
     'Source version: {language}' => "Исходная версия: {language}",

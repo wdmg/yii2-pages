@@ -123,7 +123,7 @@ class PagesController extends Controller
                         'danger',
                         Yii::t(
                             'app/modules/pages',
-                            'No display language has been set for this page. When saving, the current user language will be selected: {language}',
+                            'No display language has been set. Source language will be selected: {language}',
                             [
                                 'language' => (isset($languages[Yii::$app->sourceLanguage])) ? $languages[Yii::$app->sourceLanguage] : Yii::$app->sourceLanguage
                             ]
@@ -222,7 +222,7 @@ class PagesController extends Controller
                     'danger',
                     Yii::t(
                         'app/modules/pages',
-                        'No display language has been set for this page. When saving, the current user language will be selected: {language}',
+                        'No display language has been set. Source language will be selected: {language}',
                         [
                             'language' => (isset($languages[Yii::$app->sourceLanguage])) ? $languages[Yii::$app->sourceLanguage] : Yii::$app->sourceLanguage
                         ]
