@@ -1,7 +1,10 @@
 Changelog
 =========
 
-## 1.2.*
+## 1.2.3 (2020-04-28)
+ * Update README.md and dependencies
+ * Updating year in copyrights
+ * Change icon class (FontAwesome update)
  * Set $app->sourceLanguage by default locale
  
 ## 1.2.2 (2020-04-16)

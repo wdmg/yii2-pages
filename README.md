@@ -5,13 +5,14 @@
 [![GitHub license](https://img.shields.io/github/license/wdmg/yii2-pages.svg)](https://github.com/wdmg/yii2-pages/blob/master/LICENSE)
 
 # Yii2 Pages
-Static Page Manager
+Page Manager
 
 # Requirements 
 * PHP 5.6 or higher
 * Yii2 v.2.0.33 and newest
 * [Yii2 Base](https://github.com/wdmg/yii2-base) module (required)
-* [Yii2 Editor](https://github.com/wdmg/yii2-editor) module (required)
+* [Yii2 Translations](https://github.com/wdmg/yii2-translations) module (optionaly)
+* [Yii2 Editor](https://github.com/wdmg/yii2-editor) widget
 * [Yii2 SelectInput](https://github.com/wdmg/yii2-selectinput) widget
 
 # Installation
@@ -63,6 +64,7 @@ Use the `Module::dashboardNavItems()` method of the module to generate a navigat
     ?>
 
 # Status and version [ready to use]
+* v.1.2.3 - Update README.md and dependencies
 * v.1.2.2 - Added AliasInput::widget()
 * v.1.2.1 - Rebased to ActiveRecordML model
 * v.1.2.0 - Multi-language implementation
