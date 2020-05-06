@@ -61,6 +61,11 @@ class Module extends BaseModule
     public $baseRoute = "/pages";
 
     /**
+     * @var string, the default controller for pages in @frontend
+     */
+    public $defaultController = "admin/pages/default";
+
+    /**
      * @var string, the default layout to rendered page
      */
     public $baseLayout = "@app/views/layouts/main";
@@ -86,6 +91,9 @@ class Module extends BaseModule
 
         if (isset(Yii::$app->params["pages.baseRoute"]))
             $this->baseRoute = Yii::$app->params["pages.baseRoute"];
+
+        if (isset(Yii::$app->params["pages.defaultController"]))
+            $this->defaultController = Yii::$app->params["pages.defaultController"];
 
         if (isset(Yii::$app->params["pages.supportLocales"]))
             $this->supportLocales = Yii::$app->params["pages.supportLocales"];
@@ -138,7 +146,7 @@ class Module extends BaseModule
     {
         parent::bootstrap($app);
 
-        if (!$this->isBackend()) {
+        if (!$this->isBackend() && !is_null($this->defaultController)) {
 
             // Get language scheme if available
             $custom = false;
@@ -157,12 +165,12 @@ class Module extends BaseModule
                 case "after":
 
                     $app->getUrlManager()->addRules([
-                        '/<route:' . $baseRoute . '.*?>/<alias:[\w-]+>/<lang:\w+>' => 'admin/pages/default/view',
+                        '/<route:' . $baseRoute . '.*?>/<alias:[\w-]+>/<lang:\w+>' => $this->defaultController . '/view',
                     ], true);
 
                     if ($hide) {
                         $app->getUrlManager()->addRules([
-                            '/<route:' . $baseRoute . '.*?>/<alias:[\w-]+>' => 'admin/pages/default/view',
+                            '/<route:' . $baseRoute . '.*?>/<alias:[\w-]+>' => $this->defaultController . '/view',
                         ], true);
                     }
 
@@ -171,7 +179,7 @@ class Module extends BaseModule
                 case "query":
 
                     $app->getUrlManager()->addRules([
-                        '/<route:' . $baseRoute . '.*?>/<alias:[\w-]+>' => 'admin/pages/default/view',
+                        '/<route:' . $baseRoute . '.*?>/<alias:[\w-]+>' => $this->defaultController . '/view',
                     ], true);
 
                     /*if ($hide) {
@@ -184,7 +192,7 @@ class Module extends BaseModule
 
                     if ($host = $app->getRequest()->getHostName()) {
                         $app->getUrlManager()->addRules([
-                            'http(s)?://' . $host. '/<route:' . $baseRoute . '.*?>/<alias:[\w-]+>' => 'admin/pages/default/view',
+                            'http(s)?://' . $host. '/<route:' . $baseRoute . '.*?>/<alias:[\w-]+>' => $this->defaultController . '/view',
                         ], true);
                     }
 
@@ -197,12 +205,12 @@ class Module extends BaseModule
                 default:
 
                     $app->getUrlManager()->addRules([
-                        '/<lang:\w+>/<route:' . $baseRoute . '.*?>/<alias:[\w-]+>' => 'admin/pages/default/view',
+                        '/<lang:\w+>/<route:' . $baseRoute . '.*?>/<alias:[\w-]+>' => $this->defaultController . '/view',
                     ], true);
 
                     if ($hide || !$custom) {
                         $app->getUrlManager()->addRules([
-                            '/<route:' . $baseRoute . '.*?>/<alias:[\w-]+>' => 'admin/pages/default/view',
+                            '/<route:' . $baseRoute . '.*?>/<alias:[\w-]+>' => $this->defaultController . '/view',
                         ], true);
                     }
 
