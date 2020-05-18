@@ -47,6 +47,18 @@ use wdmg\widgets\LangSwitcher;
         ]
     ])->label(Yii::t('app/modules/pages', 'Page URL')); ?>
 
+    <?php
+        if (isset(Yii::$app->redirects) && $model->url && ($model->status == $model::STATUS_PUBLISHED)) {
+            if ($url = Yii::$app->redirects->check($model->url, false)) {
+                echo Html::tag('div', Yii::t('app/modules/redirects', 'For this URL is active redirect to {url}', [
+                    'url' => $url
+                ]), [
+                    'class' => "alert alert-warning"
+                ]);
+            }
+        }
+    ?>
+
     <?= $form->field($model, 'content')->widget(Editor::class, [
         'options' => [],
         'pluginOptions' => []
