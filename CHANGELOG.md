@@ -1,7 +1,8 @@
 Changelog
 =========
 
-## 1.2.*
+## 1.2.4 (2020-06-28)
+ * Update dependencies, README.md
  * URL redirect notify in views
  * Added `defaultController` property for module
  
