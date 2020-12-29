@@ -144,7 +144,12 @@ use wdmg\widgets\LangSwitcher;
     <hr/>
     <div class="form-group">
         <?= Html::a(Yii::t('app/modules/pages', '&larr; Back to list'), ['pages/index'], ['class' => 'btn btn-default pull-left']) ?>&nbsp;
-        <?= Html::submitButton(Yii::t('app/modules/pages', 'Save'), ['class' => 'btn btn-save btn-success pull-right']) ?>
+        <?php if ((Yii::$app->authManager && $this->context->module->moduleExist('rbac') && Yii::$app->user->can('updatePosts', [
+                'created_by' => $model->created_by,
+                'updated_by' => $model->updated_by
+            ])) || !$model->id) : ?>
+            <?= Html::submitButton(Yii::t('app/modules/pages', 'Save'), ['class' => 'btn btn-save btn-success pull-right']) ?>
+        <?php endif; ?>
     </div>
     <?php ActiveForm::end(); ?>
 </div>

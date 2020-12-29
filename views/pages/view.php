@@ -212,13 +212,18 @@ if ($model->locale && isset(Yii::$app->translations) && class_exists('\wdmg\tran
     <hr/>
     <div class="form-group">
         <?= Html::a(Yii::t('app/modules/pages', '&larr; Back to list'), ['pages/index'], ['class' => 'btn btn-default pull-left']) ?>&nbsp;
-        <div class="form-group pull-right">
-            <?= Html::a(Yii::t('app/modules/pages', 'Delete'), ['pages/delete', 'id' => $model->id], [
-                'class' => 'btn btn-delete btn-danger',
-                'data-confirm' => Yii::t('app/modules/pages', 'Are you sure you want to delete this page?'),
-                'data-method' => 'post',
-            ]) ?>
-            <?= Html::a(Yii::t('app/modules/pages', 'Update'), ['pages/update', 'id' => $model->id], ['class' => 'btn btn-edit btn-primary']) ?>
-        </div>
+        <?php if (Yii::$app->authManager && $this->context->module->moduleExist('rbac') && Yii::$app->user->can('updatePosts', [
+                'created_by' => $model->created_by,
+                'updated_by' => $model->updated_by
+            ])) : ?>
+            <div class="form-group pull-right">
+                <?= Html::a(Yii::t('app/modules/pages', 'Delete'), ['pages/delete', 'id' => $model->id], [
+                    'class' => 'btn btn-delete btn-danger',
+                    'data-confirm' => Yii::t('app/modules/pages', 'Are you sure you want to delete this page?'),
+                    'data-method' => 'post',
+                ]) ?>
+                <?= Html::a(Yii::t('app/modules/pages', 'Update'), ['pages/update', 'id' => $model->id], ['class' => 'btn btn-edit btn-primary']) ?>
+            </div>
+        <?php endif; ?>
     </div>
 </div>

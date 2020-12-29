@@ -124,4 +124,6 @@ return [
     'Are you sure you want to delete this page?' => "Вы уверены, что хотите удалить эту страницу?",
     'Are you sure you want to delete the language version of this page?' => "Вы уверены, что хотите удалить языковую версию этой страницы?",
 
+    'Error {code}. Access Denied' => 'Ошибка {code}. Доступ не разрешен',
+    'You are not allowed to view this page.' => 'Вам не разрешено просматривать эту страницу.',
 ];

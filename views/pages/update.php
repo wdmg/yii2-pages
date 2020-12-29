@@ -31,14 +31,30 @@ if ($model->locale && isset(Yii::$app->translations) && class_exists('\wdmg\tran
 }
 
 ?>
-<div class="page-header">
-    <h1><?= Html::encode($this->title) . $flag ?> <small class="text-muted pull-right">[v.<?= $this->context->module->version ?>]</small></h1>
-</div>
-<div class="pages-update">
-    <?= $this->render('_form', [
-        'model' => $model,
-        'statusModes' => $model->getStatusesList(),
-        'languagesList' => $model->getLanguagesList(false),
-        'parentsList' => $model->getParentsList(false, true)
-    ]) ?>
-</div>
+<?php if (Yii::$app->authManager && $this->context->module->moduleExist('rbac') && Yii::$app->user->can('updatePosts', [
+        'created_by' => $model->created_by,
+        'updated_by' => $model->updated_by
+    ])) : ?>
+    <div class="page-header">
+        <h1><?= Html::encode($this->title) . $flag ?> <small class="text-muted pull-right">[v.<?= $this->context->module->version ?>]</small></h1>
+    </div>
+    <div class="pages-update">
+        <?= $this->render('_form', [
+            'model' => $model,
+            'statusModes' => $model->getStatusesList(),
+            'languagesList' => $model->getLanguagesList(false),
+            'parentsList' => $model->getParentsList(false, true)
+        ]) ?>
+    </div>
+<?php else: ?>
+    <div class="page-header">
+        <h1 class="text-danger"><?= Yii::t('app/modules/pages', 'Error {code}. Access Denied', [
+                'code' => 403
+            ]) ?> <small class="text-muted pull-right">[v.<?= $this->context->module->version ?>]</small></h1>
+    </div>
+    <div class="pages-update-error">
+        <blockquote>
+            <?= Yii::t('app/modules/pages', 'You are not allowed to view this page.'); ?>
+        </blockquote>
+    </div>
+<?php endif; ?>
