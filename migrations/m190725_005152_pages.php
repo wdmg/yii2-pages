@@ -31,9 +31,9 @@ class m190725_005152_pages extends Migration
             'route' => $this->string(255)->null(),
             'layout' => $this->string(64)->null(),
             'created_at' => $this->dateTime()->defaultExpression('CURRENT_TIMESTAMP'),
-            'created_by' => $this->integer(11)->notNull()->defaultValue(0),
+            'created_by' => $this->integer(11)->null(),
             'updated_at' => $this->datetime()->defaultExpression('CURRENT_TIMESTAMP'),
-            'updated_by' => $this->integer(11)->notNull()->defaultValue(0),
+            'updated_by' => $this->integer(11)->null(),
         ], $tableOptions);
 
         $this->createIndex('{{%idx-pages-alias}}', '{{%pages}}', ['name', 'alias']);
