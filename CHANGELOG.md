@@ -1,7 +1,8 @@
 Changelog
 =========
 
-## 1.2.*
+## 1.3.0 (2023-06-25)
+ * Update copyrights, fix nav menu
  * Lang attribute for HTML tags and inputs
  
 ## 1.2.5 (2020-12-29)
